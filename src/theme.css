@@ -1,0 +1,152 @@
+/*
+ * The VitePress default theme, mapped onto the Meddleware design tokens.
+ *
+ * Every colour, surface and font of the default theme is a role from @meddleware/design-tokens, so the site follows the colour mode
+ * (VitePress's `.dark` class on <html>, which the tokens honour) and the seasons, and keeps the tokens' WCAG AAA contrast (7:1 for
+ * text and labels) by construction: nothing here is a colour of its own, only a role or a mix of roles.
+ *
+ * Declared on `:root, .dark` and loaded after VitePress's own variables, so it wins over them at equal specificity.
+ *
+ * Tone rules, as in @meddleware/ui: text in a tone colour over a tint of that tone loses contrast, so a tone block or badge keeps
+ * body-colour text and shows the tone as its border. Tinted backgrounds ("-soft") are the --lift surface, on which every text role
+ * is verified at 7:1 by the token checks; only diff and warning lines in code blocks are tinted (they hold syntax-theme colours).
+ * Nothing in the palette is purple (VitePress's "important" tone is the accent here).
+ */
+
+:root,
+.dark {
+  --vp-font-family-base: var(--mw-font-sans);
+  --vp-font-family-mono: var(--mw-font-mono);
+
+  /* Surfaces and text. */
+  --vp-c-bg: var(--bg);
+  --vp-c-bg-alt: var(--lift);
+  --vp-c-bg-elv: var(--surface);
+  --vp-c-bg-soft: var(--surface);
+  --vp-c-border: var(--border);
+  --vp-c-divider: var(--border);
+  --vp-c-gutter: var(--lift);
+  --vp-c-text-1: var(--text);
+  --vp-c-text-2: var(--muted);
+  --vp-c-text-3: var(--muted);
+
+  /* Neutral ("default") family: buttons, code backgrounds. */
+  --vp-c-gray-1: var(--border);
+  --vp-c-gray-2: var(--lift);
+  --vp-c-gray-3: var(--surface);
+  --vp-c-gray-soft: var(--lift);
+
+  /* Brand: the accent. -1 is text on the page, -3 a fill with --accent-contrast text, -2 the hover state (toward the text colour, so
+     contrast only grows), -soft a tint. */
+  --vp-c-brand-1: var(--accent);
+  --vp-c-brand-2: color-mix(in srgb, var(--accent) 82%, var(--text));
+  --vp-c-brand-3: var(--accent);
+  --vp-c-brand-soft: var(--lift);
+
+  /* Tones. */
+  --vp-c-tip-1: var(--secondary);
+  --vp-c-tip-2: color-mix(in srgb, var(--secondary) 82%, var(--text));
+  --vp-c-tip-3: var(--secondary);
+  --vp-c-tip-soft: var(--lift);
+  --vp-c-note-1: var(--secondary);
+  --vp-c-note-2: color-mix(in srgb, var(--secondary) 82%, var(--text));
+  --vp-c-note-3: var(--secondary);
+  --vp-c-note-soft: var(--lift);
+  --vp-c-success-1: var(--ok);
+  --vp-c-success-2: color-mix(in srgb, var(--ok) 82%, var(--text));
+  --vp-c-success-3: var(--ok);
+  --vp-c-success-soft: var(--lift);
+  --vp-c-important-1: var(--accent);
+  --vp-c-important-2: color-mix(in srgb, var(--accent) 82%, var(--text));
+  --vp-c-important-3: var(--accent);
+  --vp-c-important-soft: var(--lift);
+  --vp-c-warning-1: var(--warning-text);
+  --vp-c-warning-2: color-mix(in srgb, var(--warning-text) 82%, var(--text));
+  --vp-c-warning-3: var(--warning-text);
+  --vp-c-warning-soft: var(--lift);
+  --vp-c-danger-1: var(--danger);
+  --vp-c-danger-2: color-mix(in srgb, var(--danger) 82%, var(--text));
+  --vp-c-danger-3: var(--danger);
+  --vp-c-danger-soft: var(--lift);
+  --vp-c-caution-1: var(--danger);
+  --vp-c-caution-2: color-mix(in srgb, var(--danger) 82%, var(--text));
+  --vp-c-caution-3: var(--danger);
+  --vp-c-caution-soft: var(--lift);
+
+  /* Buttons: a brand fill carries the label colour made for it, not white. */
+  --vp-button-brand-text: var(--accent-contrast);
+  --vp-button-brand-hover-text: var(--accent-contrast);
+  --vp-button-brand-active-text: var(--accent-contrast);
+  --vp-button-brand-bg: var(--accent);
+  --vp-button-brand-hover-bg: color-mix(in srgb, var(--accent) 82%, var(--text));
+  --vp-button-brand-active-bg: color-mix(in srgb, var(--accent) 66%, var(--text));
+  --vp-button-alt-text: var(--text);
+  --vp-button-alt-hover-text: var(--text);
+  --vp-button-alt-active-text: var(--text);
+
+  /* Custom blocks and badges: body-colour text; the tone is the border and the tint. */
+  --vp-custom-block-info-border: var(--border);
+  --vp-custom-block-tip-border: var(--secondary);
+  --vp-custom-block-tip-text: var(--text);
+  --vp-custom-block-note-border: var(--secondary);
+  --vp-custom-block-note-text: var(--text);
+  --vp-custom-block-important-border: var(--accent);
+  --vp-custom-block-important-text: var(--text);
+  --vp-custom-block-warning-border: var(--warning-text);
+  --vp-custom-block-warning-text: var(--text);
+  --vp-custom-block-danger-border: var(--danger);
+  --vp-custom-block-danger-text: var(--text);
+  --vp-custom-block-caution-border: var(--danger);
+  --vp-custom-block-caution-text: var(--text);
+  --vp-badge-info-border: var(--border);
+  --vp-badge-tip-border: var(--secondary);
+  --vp-badge-tip-text: var(--text);
+  --vp-badge-note-border: var(--secondary);
+  --vp-badge-note-text: var(--text);
+  --vp-badge-important-border: var(--accent);
+  --vp-badge-important-text: var(--text);
+  --vp-badge-warning-border: var(--warning-text);
+  --vp-badge-warning-text: var(--text);
+  --vp-badge-danger-border: var(--danger);
+  --vp-badge-danger-text: var(--text);
+
+  /* Code: inline code in body colour (links in code keep the accent); blocks on the surface, with the high-contrast syntax themes. */
+  --vp-code-color: var(--text);
+  --vp-code-bg: var(--lift);
+  --vp-code-block-bg: var(--surface);
+  --vp-code-block-color: var(--text);
+  --vp-code-line-highlight-color: var(--lift);
+  --vp-code-line-diff-add-color: color-mix(in srgb, var(--ok) 12%, var(--surface));
+  --vp-code-line-diff-remove-color: color-mix(in srgb, var(--danger) 12%, var(--surface));
+  --vp-code-line-warning-color: color-mix(in srgb, var(--warning-text) 12%, var(--surface));
+  --vp-code-line-error-color: color-mix(in srgb, var(--danger) 12%, var(--surface));
+
+  /* Home hero: the accent into the primary, both of which pass contrast on the page in every look. */
+  --vp-home-hero-name-color: transparent;
+  --vp-home-hero-name-background: linear-gradient(135deg, var(--accent), var(--primary));
+  --vp-home-hero-image-background-image: linear-gradient(135deg, var(--accent), var(--primary));
+  --vp-home-hero-image-filter: blur(var(--space-lg));
+}
+
+/* Text enlarged to 200% on a wide screen: the doc columns are laid out in pixels while their content grows, so the main column kept its
+   desktop width and the page scrolled sideways. Letting the flex children of the doc container shrink (and long lines wrap or scroll inside
+   their own blocks) keeps the page at the viewport's width. */
+.VPDoc .container,
+.VPDoc .container > *,
+.VPDoc .content-container,
+.VPDoc .content {
+  min-width: 0;
+}
+.VPDoc .container {
+  max-width: 100%;
+}
+
+/* A feature card on the home page is one link around a title, a description and an action. Links are underlined (a colour is never the only
+   cue), but underlining the whole paragraph makes the card unreadable: the title and the action carry the underline. */
+a.VPFeature {
+  text-decoration: none;
+}
+a.VPFeature .title,
+a.VPFeature .link-text {
+  text-decoration: underline;
+}
