@@ -1,3 +1,4 @@
+import { fileURLToPath } from 'node:url'
 import { baseConfig } from '../../src/config.js'
 
 // A fixture site for the theme: every element the default theme styles (home hero, prose, code, tables, custom blocks, badges), so the
@@ -11,4 +12,6 @@ export default baseConfig({
     { text: 'Reference', items: [{ text: 'Elements', link: '/guide#elements' }] },
   ],
   sidebar: { '/': [{ text: 'Fixture', items: [{ text: 'Guide', link: '/guide' }] }] },
+  // The repository's `dist/` holds the published type declarations, so the fixture builds beside its cache.
+  extra: { outDir: fileURLToPath(new URL('./dist', import.meta.url)) },
 })
