@@ -20,7 +20,7 @@ The VitePress theme and site config shared by docs-site and dev-site (and any la
   treat comments as exempt at 5:1). Syntax colours are checked against `--surface`.
 - **The landmark edits are exact and loud.** `landmarks.js` rewrites two default-theme components as they compile. Every edit throws,
   naming the file, unless its text occurs exactly once; `tests/landmarks.test.ts` runs them against the installed VitePress, so an upgrade
-  fails here first. VitePress is pinned exactly (`2.0.0-alpha.20`) for this reason; re-check the edits on every bump, and drop an edit
+  fails here first. VitePress is pinned exactly (`2.0.0-alpha.21`) for this reason; re-check the edits on every bump, and drop an edit
   when upstream fixes it.
 - **The reset is imported.** `@meddleware/ui/reset.css` is needed for the panel classes of `AppFooter`. It is layered
   (`@layer mw.reset`) and VitePress's CSS is not, so VitePress wins wherever it styles.

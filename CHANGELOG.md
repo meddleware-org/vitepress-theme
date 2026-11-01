@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - The fixture's accessibility gate is the shared sweep (`defineA11ySuite`): besides axe at AA and AAA in every colour mode × season it now
   checks reflow at 320 px, 200% text, forced colours, reduced motion and the keyboard (focus visible and not hidden behind the fixed navigation bar).
 - `SECURITY.md` is part of the published files.
+- VitePress 2.0.0-alpha.21 (peer and development pin; the landmark edits and the fixture sweep pass unchanged).
 
 ## [0.0.1] - 2026-10-31
 
