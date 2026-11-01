@@ -1,6 +1,6 @@
 {
   "name": "@meddleware/vitepress-theme",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "type": "module",
   "description": "The Meddleware VitePress theme and config: the default theme mapped onto the design tokens (colour mode, seasons, WCAG AAA contrast), a footer, and a shared site config.",
   "license": "0BSD",
@@ -18,7 +18,8 @@
   "files": [
     "src",
     "dist",
-    "CHANGELOG.md"
+    "CHANGELOG.md",
+    "SECURITY.md"
   ],
   "exports": {
     ".": {

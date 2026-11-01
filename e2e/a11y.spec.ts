@@ -1,26 +1,15 @@
 // The theme's accessibility gate: every page of the fixture in every colour mode × season, at WCAG 2.2 AA and AAA (7:1 text and labels).
 import { expect, test } from '@playwright/test'
-import { expectAccessible } from '@meddleware/frontend-config/axe'
-import { applyLook, looks, offline } from '@meddleware/frontend-config/look'
+import { defineA11ySuite } from '@meddleware/frontend-config/a11y'
+import { offline } from '@meddleware/frontend-config/look'
 
-const PAGES = [
-  ['home', '/'],
-  ['guide', '/guide'],
-] as const
-
-for (const { viewport, theme, season } of looks().filter((l) => l.viewport === 'desktop')) {
-  for (const [name, path] of PAGES) {
-    test(`${name} has no axe violations, AA or AAA (${theme} · ${season})`, async ({ page }) => {
-      await page.emulateMedia({ colorScheme: theme as 'light' | 'dark', reducedMotion: 'reduce' })
-      await offline(page)
-      await page.goto(path)
-      await page.getByRole('heading', { level: 1 }).first().waitFor()
-      await applyLook(page, theme, season)
-      expect(viewport).toBe('desktop')
-      await expectAccessible(page, { aaa: 'gate' })
-    })
-  }
+// Every page of the fixture goes through the shared sweep: WCAG 2.2 AA and AAA (gating) in every colour mode × season, reflow at 320 px,
+// 200% text, forced colours, reduced motion and the keyboard pass (focus visible and not hidden behind the fixed navigation bar).
+const open = (path: string) => async (page: import('@playwright/test').Page) => {
+  await page.goto(path)
+  await page.getByRole('heading', { level: 1 }).first().waitFor()
 }
+defineA11ySuite({ home: open('/'), guide: open('/guide') }, { aaa: 'gate' })
 
 test('mounts without an uncaught error and has its landmarks', async ({ page }) => {
   const errors: string[] = []
