@@ -87,7 +87,7 @@ Environment and commands (2026-11-01): `npm ci`; `npm ls --all`; audit gate (0);
 ### F6 — Placeholder npm versions
 **Severity:** Info   **Disposition:** DEFERRED
 **Where:** npm — `0.0.0-rename.0`, `0.0.0-stage`.
-**Remediation / evidence:** deprecate both (credentialed npm action): `OPERATOR_TASKS.md`, npm housekeeping. Not a mainnet gate.
+**Remediation / evidence:** deprecate them (credentialed npm action): `OPERATOR_TASKS.md`, npm housekeeping item 3, with the exact command and the list of all eighteen packages. Cosmetic; not a mainnet gate.
 
 ### F7 — Positive: SSR-safe season handling and a stable footer link base
 **Severity:** Positive
