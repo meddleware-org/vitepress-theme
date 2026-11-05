@@ -18,7 +18,7 @@ The theme replaces two byte-identical copies in docs-site and dev-site. Its job 
 
 Two parts need care and both are handled with loud failure rather than silence: the **landmark patches** rewrite two default-theme components while Vite compiles them (each edit throws naming the file unless its text occurs exactly once, and a test runs them against the installed VitePress), and the **exact VitePress pin** (an alpha) that makes the first one safe. VitePress 2.0.0-alpha.21 was tried on this pass — landmark tests, build and the full sweep pass unchanged — and is adopted in 0.0.2.
 
-The review found the fixture's accessibility gate narrower than the apps' (axe only; no reflow, text-size, forced-colours, reduced-motion or keyboard checks) and `SECURITY.md` missing from the tarball; both are fixed in 0.0.2. The theme itself passes the full shared sweep in the five CI browser projects with the CI font (105 tests per run before the change; 31 per browser project after it).
+The review found the fixture's accessibility gate narrower than the apps' (axe only; no reflow, text-size, forced-colours, reduced-motion or keyboard checks), `SECURITY.md` missing from the tarball, and — once the shared keyboard walk was made reliable — the footer lying under VitePress's fixed sidebar on every page that has one (F9); all are fixed in 0.0.2. The theme itself passes the full shared sweep in the five CI browser projects with the CI font (105 tests per run before the change; 34 per browser project after it).
 
 ## Threat model / trust boundaries
 
@@ -50,7 +50,7 @@ In scope: `src/` (`config.js`, `landmarks.js`, `index.ts`, `MeddlewareLayout.vue
 
 Out of scope: the content and CSP of the sites that use it (docs-site, dev-site audits); VitePress; the token values (design-tokens audit).
 
-Environment and commands (2026-11-01): `npm ci`; `npm ls --all`; audit gate (0); `vue-tsc --noEmit`; `npm run lint` (stylelint, eslint, html-validate); `vitest` (2 files, 12 tests); `npm run build`; `npm run test:e2e` with `E2E_BROWSERS=all` and a fontconfig mapping `sans-serif`/`system-ui` to DejaVu Sans (105 passed, 2.5 min, on alpha.20); the shared sweep on the fixture in Chromium on alpha.21 (31 passed); `npm pack --dry-run --json`.
+Environment and commands (2026-11-01): `npm ci`; `npm ls --all`; audit gate (0); `vue-tsc --noEmit`; `npm run lint` (stylelint, eslint, html-validate); `vitest` (2 files, 12 tests); `npm run build`; `npm run test:e2e` with `E2E_BROWSERS=all` and a fontconfig mapping `sans-serif`/`system-ui` to DejaVu Sans (105 passed, 2.5 min, on alpha.20); the shared sweep on the fixture on alpha.21 in all five projects (170 passed, 3.4 min); `npm pack --dry-run --json`.
 
 ## Findings
 
@@ -59,7 +59,7 @@ Environment and commands (2026-11-01): `npm ci`; `npm ls --all`; audit gate (0);
 **Where:** `e2e/a11y.spec.ts`.
 **Issue:** the fixture ran axe at AA and AAA in every colour mode × season on two pages, but none of the other sweeps every app runs: reflow at 320 px, 200% text, forced colours, reduced motion, and the keyboard pass (focus visible; as of frontend-config 0.0.2, not hidden behind the fixed navigation bar). The theme is the shell of two sites and owns the navbar, sidebar and footer styling, so those regressions would have appeared first in the sites rather than here.
 **Impact:** a theme change that breaks reflow or the focus ring would pass this repo's CI and fail (or pass unnoticed) downstream.
-**Remediation / evidence:** the fixture now uses the shared `defineA11ySuite` for both pages with `aaa: 'gate'`; the landmarks test stays. 31 tests per browser project; all pass on Chromium with the CI font (alpha.21), including the keyboard pass against VitePress's fixed navbar. 0.0.2.
+**Remediation / evidence:** the fixture now uses the shared `defineA11ySuite` for both pages with `aaa: 'gate'`; the landmarks test stays. 34 tests per browser project; all pass on Chromium with the CI font (alpha.21), including the keyboard pass against VitePress's fixed navbar. 0.0.2.
 
 ### F2 — `SECURITY.md` not in the published files
 **Severity:** Low   **Disposition:** RESOLVED
@@ -82,7 +82,7 @@ Environment and commands (2026-11-01): `npm ci`; `npm ls --all`; audit gate (0);
 
 ### F5 — Positive: the theme is token-only, and passes AAA in every theme × season on five browsers
 **Severity:** Positive
-**Evidence:** no hex, `rgb()` or `hsl()` in `theme.css` (grep, stylelint); tones follow the ui tint rules (tone as border, body-colour text on `--lift`); the syntax themes are the GitHub high-contrast pair with comments recoloured to `muted`; 105 tests passed on Chromium, Firefox, WebKit and the two mobile projects with the DejaVu fallback font, then 31 shared-sweep tests on Chromium (alpha.21).
+**Evidence:** no hex, `rgb()` or `hsl()` in `theme.css` (grep, stylelint); tones follow the ui tint rules (tone as border, body-colour text on `--lift`); the syntax themes are the GitHub high-contrast pair with comments recoloured to `muted`; 105 tests passed on Chromium, Firefox, WebKit and the two mobile projects with the DejaVu fallback font, then 34 tests per project on all five (alpha.21, after F9).
 
 ### F6 — Placeholder npm versions
 **Severity:** Info   **Disposition:** DEFERRED
@@ -100,6 +100,13 @@ Environment and commands (2026-11-01): `npm ci`; `npm ls --all`; audit gate (0);
 **Impact:** none observed — only theme data objects are imported, not the highlighter; a second shiki in `node_modules` costs install size.
 **Remediation / evidence:** adjudicated; revisit if VitePress re-exports its theme list.
 
+### F9 — The footer lay under the fixed sidebar (WCAG 2.4.11 focus not obscured)
+**Severity:** Medium   **Disposition:** RESOLVED
+**Where:** `src/MeddlewareLayout.vue` (`#layout-bottom`), `src/theme.css`.
+**Issue:** VitePress hides its own footer on a page with a sidebar, because the sidebar is fixed and as tall as the viewport from 60rem. The Meddleware footer carries the legal links and stays on every page, but was rendered full width, so on a page with a sidebar its first links lay under the sidebar. Keyboard users tabbing to them lost sight of focus; docs-site's own sweep found it (three tests: the © link "hidden behind aside.VPSidebar"). The fixture's own sweep had not: its keyboard walk ended early on a repeated link label (see frontend-config F2).
+**Impact:** the legal notice link unreachable by sight for keyboard and screen-magnifier users on every documentation page.
+**Remediation / evidence:** the layout reads `useLayout().hasSidebar` and wraps the footer in `.mw-layout-footer.has-sidebar`; `theme.css` starts it where the content starts (same offsets as VitePress's own content, at the same breakpoints). Tests: three width tests (1024, 1280, 1920 px) that scroll the footer link into view and assert `elementFromPoint` is the link; the keyboard pass of the sweep now passes on the fixture in all five projects (170 passed with the CI font). 0.0.2.
+
 ---
 
 ## Section A — Invariant verification matrix
@@ -110,7 +117,7 @@ Environment and commands (2026-11-01): `npm ci`; `npm ls --all`; audit gate (0);
 | I2 | Text and labels keep 7:1 in every theme × season on every page of the fixture | token contrast gate (design-tokens); fixture sweep | `e2e/a11y.spec.ts` (AAA `gate`) on five browsers | HOLDS |
 | I3 | Every page has one `main` and one `contentinfo` | `landmarks.js` edits; layout footer | `tests/landmarks.test.ts`; e2e landmarks test; axe `landmark-*` | HOLDS |
 | I4 | A VitePress change that invalidates a patch fails the build, naming the file | `replaceOnce` | `tests/landmarks.test.ts` (12 tests total with config) | HOLDS (F3) |
-| I5 | The sweep (reflow, 200% text, forced colours, reduced motion, keyboard incl. focus not obscured) passes on the fixture | `e2e/a11y.spec.ts` | 31 tests per browser project | HOLDS (F1) |
+| I5 | The sweep (reflow, 200% text, forced colours, reduced motion, keyboard incl. focus not obscured) passes on the fixture, and the footer is never under the sidebar | `e2e/a11y.spec.ts` | 34 tests per browser project | HOLDS (F1, F9) |
 | I6 | The theme adds no inline script and no network request | `src/` | code review; e2e `pageerror` check; offline routes | HOLDS |
 | I7 | Audit documents are not site content | `baseConfig` `srcExclude: ['audit/**']` | `tests/config.test.ts` | HOLDS |
 | I8 | Season handling is browser-only | `index.ts::enhanceApp` | static build succeeds; e2e | HOLDS (code-only) |
@@ -153,7 +160,7 @@ Lockfile, `npm ci`, audit gate in CI and publish; consumers pin exactly.
 
 ## Section C — Test-coverage & hermetic/live split
 
-### C.1 Coverage grade — B+ (12 unit tests, 2 files; 31 browser tests per project, 5 projects; 2026-11-01)
+### C.1 Coverage grade — B+ (12 unit tests, 2 files; 34 browser tests per project, 5 projects; 2026-11-01)
 
 | Dimension | Assessment |
 | --- | --- |
