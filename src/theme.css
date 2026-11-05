@@ -150,3 +150,17 @@ a.VPFeature .title,
 a.VPFeature .link-text {
   text-decoration: underline;
 }
+
+/* The footer is below the page content, and the sidebar is fixed and runs the full height of the viewport (from 60rem): on a page that has
+ * one, the footer starts where the content does (the same offsets as VitePress's VPContent), or its links are covered. */
+@media (width >= 60rem) {
+  .mw-layout-footer.has-sidebar {
+    padding-inline-start: var(--vp-sidebar-width);
+  }
+}
+
+@media (width >= 90rem) {
+  .mw-layout-footer.has-sidebar {
+    padding-inline-start: calc((100% - var(--vp-layout-max-width)) / 2 + var(--vp-sidebar-width));
+  }
+}

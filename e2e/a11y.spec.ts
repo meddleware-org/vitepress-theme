@@ -23,3 +23,22 @@ test('mounts without an uncaught error and has its landmarks', async ({ page }) 
   await expect(wide ? page.getByRole('navigation', { name: 'Main' }) : page.getByRole('button', { name: /menu|navigation/i }).first()).toBeVisible()
   expect(errors).toEqual([])
 })
+
+// A footer link on a page with a sidebar must not lie under it (the sidebar is fixed and as tall as the viewport from 60rem). The keyboard
+// pass caps its walk, and VitePress pages have many links before the footer, so this asks the question directly, at the widths that matter.
+for (const width of [1024, 1280, 1920]) {
+  test(`the footer's links are not under the sidebar at ${width}px`, async ({ page }) => {
+    await page.setViewportSize({ width, height: 900 })
+    await offline(page)
+    await page.goto('/guide')
+    await page.getByRole('heading', { level: 1 }).first().waitFor()
+    const hit = await page.evaluate(() => {
+      const link = document.querySelector('footer a') as HTMLElement
+      link.scrollIntoView({ block: 'nearest' })
+      const r = link.getBoundingClientRect()
+      const top = document.elementFromPoint(r.left + r.width / 2, r.top + r.height / 2)
+      return { covered: !link.contains(top) && !top?.contains(link), by: top?.className?.toString() ?? '' }
+    })
+    expect(hit.covered, `covered by ${hit.by}`).toBe(false)
+  })
+}
