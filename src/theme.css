@@ -164,3 +164,10 @@ a.VPFeature .link-text {
     padding-inline-start: calc((100% - var(--vp-layout-max-width)) / 2 + var(--vp-sidebar-width));
   }
 }
+
+/* A long sidebar scrolls inside its own fixed column, under a sticky "curtain" the height of the navigation bar. Focus that moves up through
+   it (Shift+Tab) used to land at the very top edge, behind that curtain (WCAG 2.4.11, Focus Not Obscured). The padding keeps the focused
+   item below the bar. */
+.VPSidebar {
+  scroll-padding-block: calc(var(--vp-nav-height) + var(--vp-layout-top-height, 0px)) 2rem;
+}
