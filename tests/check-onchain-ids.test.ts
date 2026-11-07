@@ -141,10 +141,13 @@ describe('loadDeployments and checkSite, against installed clients', () => {
     expect(await loadDeployments(site.root)).toEqual(deployments)
   })
 
-  it('fails closed when a client is not installed or exports no testnet deployment', async () => {
+  it('fails closed when a client is not installed', async () => {
     rmSync(join(site.root, 'node_modules/@meddleware/sealed-storage-client'), { recursive: true })
     await expect(loadDeployments(site.root)).rejects.toThrow()
-    site.installClients({ accessGate: deployments.accessGate, sealPolicies: deployments.sealPolicies })
+  })
+
+  // A separate site, so the module resolver's cache of the failed lookup above cannot leak into this one.
+  it('fails closed when a client exports no testnet deployment', async () => {
     site.write('node_modules/@meddleware/access-gate-client/deployments.ts', 'export const ACCESS_GATE_DEPLOYMENTS: Record<string, unknown> = {}\n')
     await expect(loadDeployments(site.root)).rejects.toThrow('a client exports no testnet deployment')
   })
