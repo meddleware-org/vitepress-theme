@@ -1,6 +1,6 @@
 {
   "name": "@meddleware/vitepress-theme",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "type": "module",
   "description": "The Meddleware VitePress theme and config: the default theme mapped onto the design tokens (colour mode, seasons, WCAG AAA contrast), a footer, and a shared site config.",
   "license": "0BSD",
@@ -62,15 +62,15 @@
   },
   "peerDependencies": {
     "@meddleware/design-tokens": "^0.1.13",
-    "@meddleware/ui": "^0.1.38",
+    "@meddleware/ui": "^0.1.40",
     "typescript": ">=5.0.0",
     "vitepress": "2.0.0-alpha.21",
     "vue": "^3.5.0"
   },
   "devDependencies": {
     "@meddleware/design-tokens": "^0.1.13",
-    "@meddleware/frontend-config": "^0.0.2",
-    "@meddleware/ui": "^0.1.38",
+    "@meddleware/frontend-config": "^0.0.7",
+    "@meddleware/ui": "^0.1.40",
     "@playwright/test": "~1.64.1",
     "@types/node": "~26.6.5",
     "@vue/eslint-config-typescript": "^14.9.0",
