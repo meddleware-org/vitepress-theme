@@ -5,6 +5,21 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.0.3] - 2026-11-07
+
+### Added
+
+- **Site scripts as bins**, extracted from the copies in docs-site and dev-site so both can delete theirs: `mw-gen-llms-full`,
+  `mw-check-dist-no-audit` (and `findAuditPages`, exported as `@meddleware/vitepress-theme/check-dist-no-audit`), `mw-gen-onchain` and
+  `mw-check-onchain-ids`. They run from the consuming site's root. The only per-site differences of the last two are now configuration in
+  the site's `package.json` (`"meddleware": { "site": …, "onchainIds": … }`; see the README, "Site scripts"), and the generated tree
+  `mw-check-onchain-ids` skips is derived from `site.outBase`. Behaviour and failure modes are those of the originals (a missing client,
+  deployment, configuration or `dist/` fails; a missing on-chain package still only writes a placeholder), checked byte for byte against
+  the old scripts on both sites' real pages.
+- `typescript` as an optional peer dependency (`mw-check-onchain-ids` transpiles the clients' TypeScript `deployments`; the site's copy is used, else this package's).
+- Tests for the config reading, the unit tests of the check ported from both sites, and each bin run as a child process through a
+  `node_modules/.bin` symlink.
+
 ## [0.0.2] - 2026-11-01
 
 ### Changed

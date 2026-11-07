@@ -25,6 +25,16 @@ The VitePress theme and site config shared by docs-site and dev-site (and any la
 - **The reset is imported.** `@meddleware/ui/reset.css` is needed for the panel classes of `AppFooter`. It is layered
   (`@layer mw.reset`) and VitePress's CSS is not, so VitePress wins wherever it styles.
 
+## The site scripts
+
+`src/bin/` holds four plain-JS bins (`mw-gen-llms-full`, `mw-check-dist-no-audit`, `mw-gen-onchain`, `mw-check-onchain-ids`) that docs-site
+and dev-site share; `src/site-config.js` reads and validates the `"meddleware"` section of the consuming site's `package.json`, and
+`src/entry-point.js` is the self-run guard. They run from the **consumer's** cwd (`process.cwd()` is the site root), never from this
+package's directory, and fail closed: a missing or malformed config exits 1. An installed bin runs through a symlink in `node_modules/.bin`,
+so the guard compares `realpathSync(process.argv[1])`; `tests/site-bins.test.ts` runs every bin through such a symlink. The inline-script CSP
+check is `mw-check-csp-inline` in `@meddleware/frontend-config`; do not duplicate it here. Bins must be `// @ts-check`ed, start with
+`#!/usr/bin/env node`, be mode 755 and listed (without a leading `./`) in `bin`.
+
 ## The fixture
 
 `docs/` is a VitePress site that exercises every element the theme styles (home hero, prose, links in code, tables, code, blocks,

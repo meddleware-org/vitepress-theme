@@ -42,9 +42,51 @@ components that import their own CSS. `themeConfig`, `vite` and `markdown` in `e
 
 The reset is declared in a cascade layer, and VitePress's own CSS is unlayered, so it wins wherever it styles an element.
 
+## Site scripts
+
+The build-time scripts docs-site and dev-site used to copy are installed as bins. Run them from the site's root (the directory with
+its `package.json`); they read that directory, never this package's.
+
+| Bin | What it does |
+| --- | --- |
+| `mw-gen-llms-full <site-url> "<title>"` | writes `dist/llms-full.txt` (llmstxt.org): every published page's Markdown in one file; audit, `public/`, `.vitepress/` and generated `api`/`wire-api` pages are left out. Run after `vitepress build` |
+| `mw-check-dist-no-audit [distDir]` | exits 1 when the built site (`dist` by default) contains an audit page. `findAuditPages` is exported as `@meddleware/vitepress-theme/check-dist-no-audit` |
+| `mw-gen-onchain` | imports the canonical on-chain docs of the Move packages (`access-gate-sui`, `sealed-storage-sui`, `token-issuance-template-sui`) into `docs/<outBase>` and writes `docs/.vitepress/generated/onchain-sidebar.json`. Reads the installed packages, or `ONCHAIN_DOCS_ROOT=<dir>` (sibling checkouts). A missing package writes a placeholder and still exits 0; a missing or malformed configuration exits 1 |
+| `mw-check-onchain-ids` | exits 1 when a hand-written page carries a 32-byte `0x…` id that is not a current testnet id of `@meddleware/access-gate-client` / `@meddleware/sealed-storage-client` (or an allow-listed one), or a reference page lacks a required id. Fails closed: unreadable clients or configuration fail the check. Needs `typescript` (the site has it; else this package's) |
+
+`mw-check-csp-inline` (the inline-script CSP check) is in `@meddleware/frontend-config`, not here.
+
+`mw-gen-onchain` and `mw-check-onchain-ids` are configured by a `"meddleware"` section in the site's `package.json`:
+
+```jsonc
+{
+  "scripts": {
+    "gen:onchain": "mw-gen-onchain",
+    "check:onchain-ids": "mw-check-onchain-ids",
+    "build": "npm run gen:onchain && npm run check:onchain-ids && vitepress build docs && mw-gen-llms-full https://docs.meddleware.co.uk \"Meddleware documentation\" && mw-check-dist-no-audit"
+  },
+  "devDependencies": { "@meddleware/vitepress-theme": "^0.0.3" },
+  "meddleware": {
+    "site": {
+      "id": "docs", // this site's id in the manifests' `sites` lists
+      "outBase": "blockchain/sui/onchain", // under docs/; also the tree mw-check-onchain-ids does not scan
+      "otherSite": { "id": "dev", "origin": "https://meddleware.dev", "base": "sui/onchain" } // where pages this site leaves out are linked
+    },
+    "onchainIds": {
+      "required": { "blockchain/sui/access-gate/reference.md": ["accessGate.originalId", "accessGate.platformConfigId"] }, // page under docs/ -> ids it must show
+      "otherIds": [{ "id": "0x…64 lower-case hex digits", "reason": "why this is not a deployment" }], // optional
+      "skipDirs": ["api", "wire-api"] // optional: directory names skipped at any depth, besides node_modules, .vitepress and audit
+    }
+  }
+}
+```
+
+`required` names ids by their dotted path in the clients' testnet deployments (`accessGate.originalId`, `sealPolicies.policyConfigId`, …) and
+must name at least one page. Paths (`outBase`, `base`) are relative, without a leading or trailing slash.
+
 ## Peers
 
-`vitepress` (exact: 2.x alpha), `vue`, `@meddleware/ui`, `@meddleware/design-tokens`.
+`vitepress` (exact: 2.x alpha), `vue`, `@meddleware/ui`, `@meddleware/design-tokens`; optionally `typescript` (for `mw-check-onchain-ids`).
 
 ## Development
 
