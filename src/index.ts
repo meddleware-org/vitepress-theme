@@ -4,7 +4,9 @@
 //   export { default } from '@meddleware/vitepress-theme'
 //
 // A site that needs more extends it: `{ extends: MeddlewareTheme, enhanceApp() {…} }`.
-import DefaultTheme from 'vitepress/theme'
+// `theme-without-fonts`: the default theme minus its Inter font files (sixteen preloaded .woff2 files nothing used: the site's font is the
+// system stack of the tokens). No web font is shipped or requested.
+import DefaultTheme from 'vitepress/theme-without-fonts'
 import type { Theme } from 'vitepress'
 import { useSeason } from '@meddleware/ui'
 import MeddlewareLayout from './MeddlewareLayout.vue'

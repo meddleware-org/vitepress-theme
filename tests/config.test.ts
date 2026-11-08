@@ -27,9 +27,14 @@ describe('baseConfig', () => {
     ])
   })
 
-  it('always has the favicon, and appends the site’s own head entries', () => {
+  it('always has the favicon set, and appends the site’s own head entries', () => {
     const c = baseConfig({ ...base, head: [['meta', { name: 'x', content: 'y' }]] })
-    expect(c.head?.[0]).toEqual(['link', { rel: 'icon', type: 'image/svg+xml', href: '/favicon.svg' }])
+    expect(c.head?.slice(0, 4)).toEqual([
+      ['link', { rel: 'icon', type: 'image/svg+xml', sizes: 'any', href: '/favicon.svg' }],
+      ['link', { rel: 'icon', sizes: '48x48', href: '/favicon.ico' }],
+      ['link', { rel: 'apple-touch-icon', href: '/apple-touch-icon.png' }],
+      ['link', { rel: 'manifest', href: '/site.webmanifest' }],
+    ])
     expect(c.head?.at(-1)).toEqual(['meta', { name: 'x', content: 'y' }])
   })
 

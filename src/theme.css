@@ -171,3 +171,9 @@ a.VPFeature .link-text {
 .VPSidebar {
   scroll-padding-block: calc(var(--vp-nav-height) + var(--vp-layout-top-height, 0px)) 2rem;
 }
+
+/* The company mark before the site title in the navigation bar; it takes the title's colour, so it follows the colour mode. */
+.mw-layout-mark {
+  --mw-brand-size: 1.5rem;
+  margin-inline-end: var(--space-2xs, 0.5rem);
+}

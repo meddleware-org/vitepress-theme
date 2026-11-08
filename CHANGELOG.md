@@ -5,6 +5,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.0.5] - 2026-11-08
+
+### Added
+
+- The company mark: the navigation bar shows `BrandMark` before the site title, and the favicon set (`favicon.svg`, `.ico`, `apple-touch-icon.png`, `icon-192/512.png`) plus a web manifest come from `@meddleware/ui/brand/*` (served in development, copied into the output at build end, linked from every page). A site keeps no `public/favicon.svg`.
+
+### Changed
+
+- The theme imports `vitepress/theme-without-fonts`: VitePress's sixteen preloaded Inter font files, which the theme never used, are no longer shipped. No web font is shipped or requested.
+
 ## [0.0.4] - 2026-11-07
 
 ### Fixed

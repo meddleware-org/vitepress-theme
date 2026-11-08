@@ -11,6 +11,7 @@ import tokens from '@meddleware/design-tokens/tokens.json' with { type: 'json' }
 import githubLight from 'shiki/themes/github-light-high-contrast.mjs'
 import githubDark from 'shiki/themes/github-dark-high-contrast.mjs'
 import { landmarks } from './landmarks.js'
+import { brandDev, brandHead, copyBrand } from './brand.js'
 
 /**
  * A syntax theme with its comments in `colour`. The high-contrast GitHub themes keep every token at 7:1 except comments (5:1, which
@@ -43,7 +44,7 @@ function readableComments(theme, colour) {
  * @param {import('vitepress').DefaultTheme.Sidebar} [options.sidebar]
  * @param {'dark' | true | false | 'force-dark' | 'force-auto'} [options.appearance] The colour mode a first visit gets (the toggle always
  *   works). Default `dark`, the estate's default.
- * @param {SiteConfig['head']} [options.head] Extra `<head>` entries (the favicon and the browser-chrome colour are always there).
+ * @param {SiteConfig['head']} [options.head] Extra `<head>` entries (the favicon set, the web manifest link and the browser-chrome colour are always there).
  * @param {SiteConfig} [options.extra] Anything else, merged over the defaults (`themeConfig` and `vite` are merged one level down).
  * @returns {SiteConfig}
  */
@@ -73,10 +74,12 @@ export function baseConfig({ configUrl, title, description, nav = [], sidebar = 
     lastUpdated: false,
     appearance,
     head: [
-      ['link', { rel: 'icon', type: 'image/svg+xml', href: '/favicon.svg' }],
+      ...brandHead,
       ...chrome,
       ...head,
     ],
+    // The favicon set of the company mark comes from @meddleware/ui; the site keeps no icon of its own.
+    buildEnd: (siteConfig) => copyBrand(siteConfig.outDir, title),
     markdown: {
       // The high-contrast syntax themes with readable comments, so code keeps AAA contrast on the token surfaces in both colour modes.
       theme: { light: readableComments(githubLight, light.muted), dark: readableComments(githubDark, dark.muted) },
@@ -85,7 +88,7 @@ export function baseConfig({ configUrl, title, description, nav = [], sidebar = 
     vite: {
       ...extraVite,
       // Landmark fixes for the default theme (see landmarks.js).
-      plugins: [landmarks(), ...(extraVite?.plugins ?? [])],
+      plugins: [landmarks(), brandDev(title), ...(extraVite?.plugins ?? [])],
       ssr: {
         ...extraVite?.ssr,
         // The design-system packages ship Vue components and import their own CSS, which Node cannot load: Vite must process them
