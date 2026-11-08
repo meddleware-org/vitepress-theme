@@ -188,7 +188,7 @@ Hermetic: all of it (fixture site; routes refuse non-local requests). Live: the 
 - [ ] placeholder versions deprecated (F6) — maintainer
 
 ### pre-mainnet
-- [ ] external review; move to a stable VitePress 2.x when released
+- [ ] external review (ADR-0009 gate G4: not a launch gate; covered by redeploy and the audit pass); move to a stable VitePress 2.x when released
 - [ ] renumber to 0.2.0 at go-live
 
 ## Cross-project themes
