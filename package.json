@@ -71,7 +71,7 @@
     "@meddleware/design-tokens": "^0.1.13",
     "@meddleware/frontend-config": "^0.0.8",
     "@meddleware/ui": "^0.1.41",
-    "@playwright/test": "~1.64.1",
+    "@playwright/test": "~1.65.0",
     "@types/node": "~26.6.5",
     "@vue/eslint-config-typescript": "^14.9.0",
     "autoprefixer": "^10.6.2",
@@ -87,7 +87,7 @@
     "stylelint-config-standard": "^40.0.0",
     "typescript": "~6.0.0",
     "vitepress": "2.0.0-alpha.21",
-    "vitest": "~5.0.5",
+    "vitest": "~5.1.0",
     "vue": "^3.5.44",
     "vue-eslint-parser": "^10.4.1",
     "vue-tsc": "~3.3.13"
