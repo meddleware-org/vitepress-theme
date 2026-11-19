@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import tokens from '@meddleware/design-tokens/tokens.json' with { type: 'json' }
-import { baseConfig } from '../src/config.js'
+import { baseConfig, unstoredAppearance } from '../src/config.js'
 
 const configUrl = 'file:///site/docs/.vitepress/config.ts'
 const base = { configUrl, title: 'T', description: 'D' }
@@ -14,7 +14,7 @@ describe('baseConfig', () => {
 
   it('carries the estate defaults', () => {
     const c = baseConfig(base)
-    expect(c).toMatchObject({ title: 'T', description: 'D', lang: 'en-GB', cleanUrls: true, lastUpdated: false, appearance: 'dark', srcExclude: ['audit/**'] })
+    expect(c).toMatchObject({ title: 'T', description: 'D', lang: 'en-GB', cleanUrls: true, lastUpdated: false, appearance: { initialValue: 'dark', storageKey: null }, srcExclude: ['audit/**'] })
     expect(c.themeConfig).toMatchObject({ search: { provider: 'local' }, socialLinks: [{ icon: 'github', link: 'https://github.com/meddleware-org' }] })
   })
 
@@ -72,5 +72,18 @@ describe('baseConfig', () => {
     expect(c.vite?.ssr?.noExternal).toContain('some-package')
     expect((c.vite?.ssr?.noExternal as unknown[]).some((r) => r instanceof RegExp)).toBe(true)
     expect(c.markdown).toMatchObject({ lineNumbers: true, theme: { light: { name: 'github-light-high-contrast-readable-comments' } } })
+  })
+})
+
+describe('unstoredAppearance (STORAGE_LEDGER B12)', () => {
+  it('keeps the first-visit mode and never stores the choice', () => {
+    expect(unstoredAppearance('dark')).toEqual({ initialValue: 'dark', storageKey: null })
+    expect(unstoredAppearance(true)).toEqual({ initialValue: 'auto', storageKey: null })
+  })
+
+  it('leaves the modes that store nothing alone', () => {
+    expect(unstoredAppearance(false)).toBe(false)
+    expect(unstoredAppearance('force-dark')).toBe('force-dark')
+    expect(unstoredAppearance('force-auto')).toBe('force-auto')
   })
 })

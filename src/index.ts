@@ -21,6 +21,14 @@ const theme: Theme = {
   enhanceApp() {
     // Browser only (a no-op while rendering the static pages): the season follows the calendar.
     useSeason()
+    // Earlier versions let VitePress store the colour mode on every first visit; nothing reads that key now (see `unstoredAppearance`).
+    if (typeof window !== 'undefined') {
+      try {
+        window.localStorage.removeItem('vitepress-theme-appearance')
+      } catch {
+        // storage blocked: nothing was stored either
+      }
+    }
   },
 }
 

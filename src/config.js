@@ -35,6 +35,22 @@ function readableComments(theme, colour) {
  */
 
 /**
+ * The colour-mode setting handed to VitePress: the same first-visit mode, with the choice never written to the browser. VitePress's
+ * switch uses VueUse `useDark`, which stores its value under `vitepress-theme-appearance` on the first page load, before the visitor
+ * does anything (`writeDefaults`); `storageKey: null` keeps the choice in memory instead, so it lasts across the site's own navigation
+ * and goes with the tab (PECR Sch. A1; workspace docs/legal STORAGE_LEDGER B12). The fixed modes store nothing already.
+ *
+ * @param {'dark' | true | false | 'force-dark' | 'force-auto'} appearance
+ * @returns {import('vitepress').UserConfig['appearance']}
+ */
+export function unstoredAppearance(appearance) {
+  if (appearance === 'dark') return { initialValue: 'dark', storageKey: null }
+  // `initialValue` must be a value, not VitePress's getter: without a storage key VueUse wraps it as is, and a getter cannot be switched.
+  if (appearance === true) return /** @type {never} */ ({ initialValue: 'auto', storageKey: null })
+  return appearance
+}
+
+/**
  * @param {object} options
  * @param {string} options.configUrl `import.meta.url` of the site's `docs/.vitepress/config.ts`: the source directory is `docs/` and the
  *   output the repository's `dist/` (a Dockerfile copies `dist/` into the static server).
@@ -72,7 +88,7 @@ export function baseConfig({ configUrl, title, description, nav = [], sidebar = 
     srcExclude: ['audit/**'],
     cleanUrls: true,
     lastUpdated: false,
-    appearance,
+    appearance: unstoredAppearance(appearance),
     head: [
       ...brandHead,
       ...chrome,
