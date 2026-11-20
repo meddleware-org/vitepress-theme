@@ -96,3 +96,7 @@ season (`E2E_BROWSERS=all` for five browsers); `npm run shots` captures the scre
 ## Licence
 
 0BSD.
+
+## Open standards
+
+What this project speaks, what is planned and where you can extend it: [INTEROP.md](INTEROP.md).

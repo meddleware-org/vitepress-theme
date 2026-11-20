@@ -46,3 +46,7 @@ page, plus a landmark smoke test. Add an element there when the theme gains styl
 Version, CHANGELOG and lockfile are bumped by the release tooling. Push, tag `v<version>`; `npm-publish.yml` publishes with npm trusted
 publishing after `node-ci.yml` (lint, tests, build, the five-browser gate, package contents) and the `node24-compat` job pass. Consumers
 pin `^0.0.x`, an exact pin on 0.0.x, so bump them together.
+
+## Interoperability
+
+- [INTEROP.md](INTEROP.md): the standards this project speaks, what is planned, where to extend it, and what proves each claim.
