@@ -87,3 +87,11 @@ describe('unstoredAppearance (STORAGE_LEDGER B12)', () => {
     expect(unstoredAppearance('force-auto')).toBe('force-auto')
   })
 })
+
+describe('footerLinks', () => {
+  it('reaches the theme config for the layout, and defaults to none', () => {
+    const links = [{ text: 'Treasury', link: 'https://treasury.meddleware.co.uk' }]
+    expect((baseConfig({ ...base, footerLinks: links }).themeConfig as { footerLinks: unknown }).footerLinks).toEqual(links)
+    expect((baseConfig(base).themeConfig as { footerLinks: unknown }).footerLinks).toEqual([])
+  })
+})

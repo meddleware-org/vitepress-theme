@@ -61,10 +61,12 @@ export function unstoredAppearance(appearance) {
  * @param {'dark' | true | false | 'force-dark' | 'force-auto'} [options.appearance] The colour mode a first visit gets (the toggle always
  *   works). Default `dark`, the estate's default.
  * @param {SiteConfig['head']} [options.head] Extra `<head>` entries (the favicon set, the web manifest link and the browser-chrome colour are always there).
+ * @param {{ text: string, link: string }[]} [options.footerLinks] Links the footer shows beside the copy notice (e.g. the treasury): things
+ *   a reader may want that are not part of the site's own navigation (MeddlewareLayout reads them from `themeConfig.footerLinks`).
  * @param {SiteConfig} [options.extra] Anything else, merged over the defaults (`themeConfig` and `vite` are merged one level down).
  * @returns {SiteConfig}
  */
-export function baseConfig({ configUrl, title, description, nav = [], sidebar = {}, appearance = 'dark', head = [], extra = {} }) {
+export function baseConfig({ configUrl, title, description, nav = [], sidebar = {}, appearance = 'dark', head = [], footerLinks = [], extra = {} }) {
   const { themeConfig: extraTheme, vite: extraVite, markdown: extraMarkdown, ...rest } = extra
   const { light, dark } = tokens.semantic
   // The browser chrome follows the page: one colour when the site starts dark, a light and a dark one otherwise. Both are the page
@@ -117,6 +119,8 @@ export function baseConfig({ configUrl, title, description, nav = [], sidebar = 
       socialLinks: [{ icon: 'github', link: 'https://github.com/meddleware-org' }],
       nav,
       sidebar,
+      // Not a default-theme key: MeddlewareLayout renders it in the footer.
+      .../** @type {object} */ ({ footerLinks }),
       ...extraTheme,
     },
     ...rest,

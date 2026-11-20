@@ -13,5 +13,7 @@ export default baseConfig({
   ],
   sidebar: { '/': [{ text: 'Fixture', items: [{ text: 'Guide', link: '/guide' }] }] },
   // The repository's `dist/` holds the published type declarations, so the fixture builds beside its cache.
+  // Exercises the footer's site links (MeddlewareLayout).
+  footerLinks: [{ text: 'Treasury', link: 'https://treasury.meddleware.co.uk' }],
   extra: { outDir: fileURLToPath(new URL('./dist', import.meta.url)) },
 })

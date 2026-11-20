@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- `baseConfig({ footerLinks })`: links the footer shows beside the copy notice (the sites use it for the treasury), rendered by
+  `MeddlewareLayout` from `themeConfig.footerLinks`.
+
 - CI: `HOME=/root` is set on the browser-test command only, not the whole job, so the runner no longer warns that it cannot read
   `/root/.docker/config.json`.
 
