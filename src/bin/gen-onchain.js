@@ -45,9 +45,14 @@ export const PACKAGES = [
 
 // Standard page names every manifest uses; placeholders are written for all of them so hand-written
 // pages on either site can link to them without risking a dead link in a build without the package.
+/** The page names every manifest uses. */
 const STANDARD_PAGES = ['overview', 'user-guide', 'dev-guide', 'api-reference']
 
-/** @param {string} file */
+/**
+ * A page's file name without `.md`, which is its URL under clean URLs.
+ * @param {string} file
+ * @returns {string}
+ */
 const stem = (file) => file.replace(/\.md$/, '')
 
 /**
@@ -184,6 +189,7 @@ export function generateOnchain({ root = process.cwd(), site = readSiteConfig(ro
   return { sidebar, failures }
 }
 
+// Run as a command: a missing or malformed site configuration exits 1; a missing package only writes a placeholder (the site still builds).
 if (isEntryPoint(import.meta.url)) {
   let site
   try {

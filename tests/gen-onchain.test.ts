@@ -1,9 +1,15 @@
+/**
+ * Tests for the on-chain docs import (`src/bin/gen-onchain.js`): links are rewritten (kept relative when the page is on this site, sent to the other
+ * site or to the repository otherwise), pages are copied under the configured base with a source footer, the sidebar is written, and a missing package
+ * gives a placeholder and a warning rather than a failed build. The packages are fakes in a temp directory.
+ */
 import { existsSync, mkdirSync, readFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { generateOnchain, PACKAGES, rewriteLinks } from '../src/bin/gen-onchain.js'
 import { cleanupSites, devSite, docsSite, TempSite } from './helpers/site'
 
+/** A manifest like the Move packages publish: four pages, each for one or both sites (`gone.md` is listed but absent). */
 const manifest = {
   package: '@meddleware/access-gate-sui',
   slug: 'access-gate',
@@ -17,6 +23,7 @@ const manifest = {
   ],
 }
 
+/** The site being generated into, and the fake "workspace" holding the package's docs (the `ONCHAIN_DOCS_ROOT` override points at it). */
 let site: TempSite
 let source: TempSite
 beforeEach(() => {
@@ -25,6 +32,7 @@ beforeEach(() => {
   source.write('access-gate-sui/docs/onchain/overview.md', 'See [guide](./user-guide.md#top), [dev](dev-guide.md), [sec](../../SECURITY.md#x), [web](https://x.test/a.md), [here](#h).\n')
   source.write('access-gate-sui/docs/onchain/user-guide.md', '# User\n')
   source.write('access-gate-sui/docs/onchain/dev-guide.md', '# Dev\n')
+  // The generator logs and warns; the tests assert on files, so the noise is silenced (and restored in afterEach).
   vi.spyOn(console, 'log').mockImplementation(() => {})
   vi.spyOn(console, 'warn').mockImplementation(() => {})
 })
@@ -32,8 +40,11 @@ afterEach(() => {
   vi.restoreAllMocks()
   cleanupSites()
 })
+/** A temp site with a configuration. */
 const make = (config: typeof docsSite | typeof devSite) => (site = new TempSite(config))
+/** A generated file's text. */
 const read = (rel: string) => readFileSync(join(site.root, rel), 'utf8')
+/** Run the generator for a site, using the fake workspace as the docs root. */
 const generate = (config: typeof docsSite | typeof devSite) => generateOnchain({ root: make(config).root, docsRootOverride: source.root })
 
 describe('rewriteLinks', () => {
@@ -56,8 +67,10 @@ describe('rewriteLinks', () => {
 
 describe('generateOnchain', () => {
   it('copies the pages for this site under outBase, with rewritten links and a source footer, and writes the sidebar', () => {
+    // docs-site publishes the overview and the user guide; the developer guide belongs to dev-site, so it is not copied here.
     const { sidebar } = generate(docsSite)
     const overview = read('docs/blockchain/sui/onchain/access-gate/overview.md')
+    // The links: a page on this site stays relative, a page of the other site becomes an absolute URL there, and a repo file becomes a GitHub URL.
     expect(overview).toContain('[guide](./user-guide#top), [dev](https://meddleware.dev/sui/onchain/access-gate/dev-guide), [sec](https://github.com/example/access-gate-sui/blob/main/SECURITY.md#x)')
     expect(overview).toContain('Canonical source: [`@meddleware/access-gate-sui` → `docs/onchain/overview.md`](https://github.com/example/access-gate-sui/blob/main/docs/onchain/overview.md)')
     expect(existsSync(join(site.root, 'docs/blockchain/sui/onchain/access-gate/user-guide.md'))).toBe(true)
@@ -70,6 +83,7 @@ describe('generateOnchain', () => {
         { text: 'User guide', link: '/blockchain/sui/onchain/access-gate/user-guide' },
       ],
     })
+    // The sidebar is also written to disk, where the site's VitePress config reads it.
     expect(JSON.parse(read('docs/.vitepress/generated/onchain-sidebar.json'))).toEqual(sidebar)
   })
 

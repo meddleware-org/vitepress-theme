@@ -4,11 +4,28 @@
 **Project:** repos/vitepress-theme (`@meddleware/vitepress-theme`) — the VitePress theme and shared site config for docs-site and dev-site: the default theme mapped onto the design tokens (colour mode, seasons, AAA contrast), a layout with the Meddleware footer, `baseConfig`, and exact-match landmark fixes applied to two default-theme components.
 **Project type:** VitePress theme (Vue layout component + CSS + a Node-loaded config and a Vite plugin) — published as source plus one built `.d.ts`
 **Template:** AUDIT_TEMPLATE.md (2026-11-01) + AUDIT_TEMPLATE_TS.md (2026-11-01) + AUDIT_TEMPLATE_VUE.md (2026-11-01, library rows; the hosting-header rows belong to the consuming sites) + AUDIT_TEMPLATE_SITE.md (2026-09-30, config rows: drafts exclusion, inline scripts) + AUDIT_TEMPLATE_A11Y.md (2026-11-01). Not triggered: `AUDIT_TEMPLATE_SUI_CLIENT.md` (no chain code; the footer links nowhere on-chain), `AUDIT_TEMPLATE_IMG.md` (no image — the sites that use it build one), `AUDIT_TEMPLATE_WALRUS.md`.
-**Deployment status:** *(Current, 2026-11-05: `0.0.2` is released to npm with provenance (CI green, trusted publishing); consumers take it through their own 2026-11-05 releases. The text below is the earlier history, kept as written.)* npm `@meddleware/vitepress-theme` 0.0.1 (released 2026-10-31, tag `v0.0.1`, publish green, provenance on the registry — checked 2026-11-01); 0.0.2 released 2026-11-05 (F1, F2, VitePress alpha.21). Placeholder versions `0.0.0-rename.0` / `0.0.0-stage` exist (F6). Consumers (`^0.0.1`, exact on 0.0.x): docs-site, dev-site. Not an image, not deployed itself; its output is part of the docs. and dev. images.
-**Review date:** 2026-11-01
+**Added 2026-11-21 (Part B documentation pass):** `AUDIT_TEMPLATE_DOCS.md` (2026-11-20); `AUDIT_TEMPLATE_RFC.md` (2026-11-19), partial: the config shapes, `llms-full.txt`, the web manifest and favicon set, and the HTML and CSS the theme produces; `AUDIT_TEMPLATE_IOP.md` (2026-11-19), partial: public API and versioning; `AUDIT_TEMPLATE_PRIV.md` (2026-11-20), partial: what the theme stores or requests in a visitor's browser (nothing; it removes an old storage key).
+**Deployment status:** *(Current, 2026-11-21: npm **`0.0.7` is `latest`** (tag `v0.0.7` → `ebefa03`, released 2026-11-20); one documentation commit since the tag, nothing under `src/`. Consumers (dependencies, `^0.0.7`): docs-site and dev-site. 21 files, 78 kB unpacked (`npm pack --dry-run`). Dependabot group #8 (nine updates) is open with every check green, the five browser jobs included. The two statements below are history.)* *(Earlier, 2026-11-05: `0.0.2` is released to npm with provenance (CI green, trusted publishing); consumers take it through their own 2026-11-05 releases. The text below is the earlier history, kept as written.)* npm `@meddleware/vitepress-theme` 0.0.1 (released 2026-10-31, tag `v0.0.1`, publish green, provenance on the registry — checked 2026-11-01); 0.0.2 released 2026-11-05 (F1, F2, VitePress alpha.21). Placeholder versions `0.0.0-rename.0` / `0.0.0-stage` exist (F6). Consumers (`^0.0.1`, exact on 0.0.x): docs-site, dev-site. Not an image, not deployed itself; its output is part of the docs. and dev. images.
+**Review date:** 2026-11-01; Part B documentation pass 2026-11-21 (DOCS, RFC, IOP and PRIV lenses first applied)
 **Reviewer:** Internal review
 **Severity ceiling:** Low — build-time code in two sites' builds and static presentation in the browser; it handles no user data, makes no request and holds no key. The realistic harms are a theme regression that makes the documentation sites harder to use, or a compromised release running in two site builds.
 **Status:** first-pass baseline 2026-11-01 (0.0.2 released 2026-11-05). 8 findings (2 Positive): 2 RESOLVED in source, 1 MITIGATED, 2 ADJUDICATED, 1 DEFERRED (maintainer-only).
+Documentation pass 2026-11-21 (0.0.7 current): F9 (added later) and F10 are RESOLVED. Totals: F1 to F10, of which F5 and F7 are Positive: 8 dispositioned findings: 4 RESOLVED (F1, F2, F9, F10), 1 MITIGATED (F3), 2 ADJUDICATED (F4, F8), 1 DEFERRED (F6).
+
+**Front matter (DOCS, RFC, IOP and PRIV lenses, added 2026-11-21):**
+
+| Field | Value |
+| --- | --- |
+| Documentation status | ledger (workspace `docs/audit/DOCS_LEDGER.tsv`): 54 tracked files, 51 done (47 measured against the thresholds), 3 excluded (the lockfile, `LICENSE`, the generated `INTEROP.md`), 0 pending, 0 fu (2026-11-21 pass) |
+| Required documents | README, CHANGELOG, SECURITY, CONTRIBUTING (added 2026-11-21), LICENSE (0BSD), CLAUDE.md, AGENTS.md (added 2026-11-21): all present |
+| Doc lints | `check-docs.mjs` (workspace) is the gate. The shared `eslint-plugin-jsdoc` fragment is switched on here after the Phase 5 release of `@meddleware/frontend-config` |
+| Standards spoken | VitePress configuration and theme API — implements the theme and the shared config; HTML (landmarks: `<main>`, one `contentinfo`) — implements the edits; CSS custom properties and `color-mix()` — implements `theme.css`; WCAG 2.2 AA and AAA — implements, proven by the fixture sweeps; llms.txt convention (`llms-full.txt`) — implements; Web App Manifest (W3C) — implements the manifest; JSON (RFC 8259) for the `"meddleware"` section — consumes; SPDX `0BSD`, Sigstore / SLSA — as the other packages |
+| Deviations | none |
+| Drafts relied on | llms.txt (an informal convention, llmstxt.org, not a standard): used for an optional file; nothing depends on it |
+| Data a person can take away | none: the package holds no data about anyone |
+| Personal data | none |
+| Browser storage | none written; the theme removes the old `vitepress-theme-appearance` key (STORAGE_LEDGER B12) |
+| Requests to other hosts | none (no web font, no script, no analytics; the fixture's browser tests refuse every non-local request) |
 
 ---
 
@@ -45,6 +62,8 @@ The review found the fixture's accessibility gate narrower than the apps' (axe o
 Critical / High / Medium / Low / Info / Positive — unchanged across the corpus.
 
 ## Scope
+
+In scope on 2026-11-21 (Part B documentation pass): every tracked file, 54 in all (the sources and the four bins, the tests and their helper, the fixture site, the e2e specs, the configurations, the workflows and the documents). Environment and commands: `npm ci`; `npm run type-check`; `npm run lint`; `npm test` (10 files, 79 tests); `npm run build`; `npm run test:e2e` on Chromium (34 tests); `npx --no-install mw-audit-gate` (0 advisories); `npm pack --dry-run` (21 files, 77,927 bytes).
 
 In scope: `src/` (`config.js`, `landmarks.js`, `index.ts`, `MeddlewareLayout.vue`, `theme.css`, `env.d.ts`), `docs/` (the fixture site), `e2e/`, `tests/`, `package.json` (peers, `files`, `exports`), `.github/`, `SECURITY.md`, `CLAUDE.md`, the tarball, the registry record.
 
@@ -109,6 +128,24 @@ Environment and commands (2026-11-01): `npm ci`; `npm ls --all`; audit gate (0);
 
 ---
 
+### Part B documentation pass (2026-11-21)
+
+Scope: every tracked file read against the workspace's `docs/operations/DOCUMENTATION_STANDARD.md` and annotated (Part B Phase 1, the sixth repository); the DOCS, RFC, IOP and PRIV lenses applied for the first time.
+Before and after editing: `npm ci`, type-check, lint, the 79 tests, the build, the 34 browser tests on Chromium (the CI runs all five) and the audit gate passed. The diff is comment-only: the TypeScript and
+JavaScript compile to identical output with comments removed, the built `dist/config.d.ts` has identical code (its comments gained the descriptions), the YAML parses to identical values apart from the audit-gate
+command in `node-ci.yml` (FU-0196), and `.gitignore` has the same patterns.
+
+### F10 — Documentation drift found by the documentation pass
+**Severity:** Low   **Disposition:** RESOLVED (2026-11-21, unreleased)
+**Where:** this audit, `README.md`, `CLAUDE.md`, `.github/audit-gate.mjs`.
+**Issue:** (1) this audit gave 0.0.2 as current, a tarball of 12 files (it is 21: the four site-script bins, the site-config reader and the brand module were added since), 12 unit tests in two files (79 in ten) and the
+scope of the first pass, so a reader would not know the bins were audited at all; (2) the README's Development section named three commands and no checks; CLAUDE.md had no Commands, Gotchas or Related section and did not
+say that the layout must stay single-root; (3) there was no `AGENTS.md` or `CONTRIBUTING.md`; (4) `.github/audit-gate.mjs` was an un-annotated copy of the shared gate (one of the nine copies of FU-0196) although
+`@meddleware/frontend-config`, a dev dependency, ships it as `mw-audit-gate`.
+**Impact:** none on the code. The audit under-described what is published and tested.
+**Remediation / evidence:** the facts above are checked against npm and the consumers' manifests; the README and CLAUDE.md have the commands; the missing documents are added; CI runs `npx --no-install mw-audit-gate` and
+the copy is removed (FU-0196).
+
 ## Section A — Invariant verification matrix
 
 | # | Invariant | Enforced at | Proven by | Status |
@@ -148,7 +185,7 @@ Audit gate: 0 high/critical, allowlist empty.
 
 ### B.TS-1 Packaging
 
-`files`: `src`, `dist`, `CHANGELOG.md`, `SECURITY.md` (F2). `npm pack --dry-run`: 12 files, 8 KiB — sources, `dist/config.d.ts`, `dist/landmarks.d.ts`, no `docs/`, `e2e/`, tests or config. CI asserts the whitelist. `exports`: `.` (TS source — compiled by the site's Vite, `ssr.noExternal` for `@meddleware/*`), `./config` (plain JS + built types — Node cannot load TS from `node_modules`), `./theme.css`. `sideEffects` lists CSS and Vue files.
+`files`: `src`, `dist`, `CHANGELOG.md`, `SECURITY.md` (F2). `npm pack --dry-run` on 2026-11-21: 21 files, 78 kB (the four bins, `site-config.js`, `entry-point.js`, `brand.js` and the types were added after the first pass); on 2026-11-01: 12 files, 8 KiB — sources, `dist/config.d.ts`, `dist/landmarks.d.ts`, no `docs/`, `e2e/`, tests or config. CI asserts the whitelist. `exports`: `.` (TS source — compiled by the site's Vite, `ssr.noExternal` for `@meddleware/*`), `./config` (plain JS + built types — Node cannot load TS from `node_modules`), `./theme.css`. `sideEffects` lists CSS and Vue files.
 
 ### B.TS-2 Install-time code
 
@@ -156,11 +193,57 @@ None (`prepublishOnly` builds the types). One Vite plugin (`landmarks`) runs in 
 
 ### B.TS-3 Supply-chain gates
 
-Lockfile, `npm ci`, audit gate in CI and publish; consumers pin exactly.
+Lockfile, `npm ci`, audit gate in CI and publish (`npx --no-install mw-audit-gate`, from `@meddleware/frontend-config`, since 2026-11-21; a copy of the same file before, FU-0196); consumers pin exactly.
+
+### B.DOCS-1 Ledger state
+
+54 tracked files: 51 done (47 measured against the thresholds), 3 excluded (lockfile, licence text, generated `INTEROP.md`), 0 pending, 0 `fu:` rows (2026-11-21, commit recorded in the ledger).
+
+### B.DOCS-2 Commands run
+
+Every command in the README's Development section, CLAUDE.md's Commands section and CONTRIBUTING.md was run on 2026-11-21 and gave what the documents say: `npm ci`, `npm run type-check`, `npm run lint`,
+`npm test` (79 tests), `npm run build`, `npm run test:e2e` (34 tests on Chromium), `npx --no-install mw-audit-gate`, `npm pack --dry-run` (21 files).
+
+### B.DOCS-3 Generated documentation
+
+`INTEROP.md` is generated by the workspace's `scripts/interop/gen-interop.py` from `config/interop.yaml` and checked there. `dist/config.d.ts` is generated by `npm run build` and is not tracked.
+
+### B.RFC-1 Standards inventory
+
+| Interface | Standard (and version) | Role | Where | Conformance evidence | Deviation |
+| --- | --- | --- | --- | --- | --- |
+| Site configuration | VitePress `UserConfig` (2.0 alpha, pinned exactly) | implements `baseConfig` | `src/config.js` | `tests/config.test.ts` | the alpha is not a stable release: the pin and the landmark tests are the control (F3) |
+| Landmarks | HTML living standard (`<main>`, `contentinfo`) | implements the two edits | `src/landmarks.js` | `tests/landmarks.test.ts` against the installed VitePress; the fixture sweep | — |
+| Accessibility | WCAG 2.2 AA and AAA | implements, through tokens only | `src/theme.css` | `e2e/a11y.spec.ts` in five engines, every theme × season | — |
+| Colour | CSS custom properties, `color-mix()` | implements | `src/theme.css` | stylelint (token-only rule) | — |
+| Agent text | llms.txt convention (`llms-full.txt`) | implements an optional file | `src/bin/gen-llms-full.js` | `tests/gen-llms-full.test.ts` | the convention is informal; nothing depends on it |
+| Icons and manifest | Web Application Manifest (W3C) | implements | `src/brand.js` | `tests/brand.test.ts` | `display: browser` on purpose (a documentation site is not an installable app) |
+| Site settings | JSON (RFC 8259) | consumes the `"meddleware"` section of the site's package.json | `src/site-config.js` | `tests/site-config.test.ts` (fails closed, names the key) | — |
+| Module | ECMAScript modules (ECMA-262) | implements | `src/*.js`, `src/index.ts` | the sites' builds import it | — |
+| Provenance | Sigstore / SLSA (npm provenance) | consumes | `npm-publish.yml` | `dist.attestations` on npm (checked for earlier releases) | — |
+
+### B.IOP-1 Export and exit drill
+
+Not applicable: the package holds no data about anyone. A site leaves by dropping the theme (its content is Markdown) or by copying `src/theme.css` and the layout.
+
+### B.IOP-2 Exit register entries
+
+npm (publication) and GitHub Actions (CI). VitePress is the framework (open source, exact-pinned, F3). No run-time dependency of the published site on any third party.
+
+### B.IOP-3 API stability
+
+The public API is `baseConfig` and its options, `unstoredAppearance`, the theme object, the four bins and the `"meddleware"` section they read. Versioning is patch-only until mainnet (workspace policy), so a consumer's
+`^0.0.x` is an exact pin; a rename or removal is a breaking change and is announced in `CHANGELOG.md`. VitePress itself is pinned exactly because the landmark edits depend on its internals.
+
+### B.PRIV-1 / B.PRIV-2 / B.PRIV-3 Privacy inventories
+
+Personal data: none. Client-side: the theme writes nothing to the browser and removes the old `vitepress-theme-appearance` key that earlier versions let VitePress write on the first visit (`unstoredAppearance`,
+STORAGE_LEDGER B12; the colour mode is kept in memory and goes with the tab). Requests: none to other hosts; no web font (`theme-without-fonts`; `tests/no-fonts.test.ts`), no script of its own, no analytics; the
+fixture's browser tests refuse every non-local request. Logs: the bins print to the build's own console only. Recorded 2026-11-21.
 
 ## Section C — Test-coverage & hermetic/live split
 
-### C.1 Coverage grade — B+ (12 unit tests, 2 files; 34 browser tests per project, 5 projects; 2026-11-01)
+### C.1 Coverage grade — B+ (79 unit tests in 10 files; 34 browser tests per project, 5 projects; 2026-11-21. On 2026-11-01: 12 unit tests in 2 files)
 
 | Dimension | Assessment |
 | --- | --- |
@@ -209,6 +292,21 @@ Hermetic: all of it (fixture site; routes refuse non-local requests). Live: the 
 - **VT-M5** MUST pass the full shared accessibility sweep on its fixture (I5).
 - **VT-M6** MUST exclude `audit/**` from site content (I7).
 
+**Lens baselines (DOCS, RFC, IOP, PRIV), first recorded 2026-11-21:**
+
+| ID | Holds? | Evidence |
+| --- | --- | --- |
+| DOCS-M1 | yes (all seven documents; 0BSD; CHANGELOG per release with an Unreleased section) | B.DOCS-1 |
+| DOCS-M2 | yes (every file's header and every declaration documented; ledger rows done) | `check-docs.mjs --report vitepress-theme` |
+| DOCS-M3 | yes (the `"meddleware"` section and `ONCHAIN_DOCS_ROOT` are in the README's "Site scripts" and the bins' headers) | README, `src/bin/*.js` |
+| DOCS-M4 | yes (commands run, links resolve, ids exist) | B.DOCS-2 |
+| DOCS-M5 | yes (no TODO, FIXME, XXX or HACK) | `check-docs.mjs` |
+| DOCS-M6 | yes (CLAUDE.md verified against the code, F10; AGENTS.md points to it) | this pass |
+| DOCS-M7 | yes (no secrets or private data; the source ships with its comments, which say nothing private; the layout's template carries no comment, which would break single-root in development) | inspection |
+| RFC-M1 to RFC-M7 | yes where they apply (B.RFC-1); M5 is the hosts', not a package's | B.RFC-1 |
+| IOP-M3, IOP-M5 | yes (B.IOP-3; no data, no ads, no tracking); IOP-M1, M2, M4, M6, M7: not applicable (no data, no service) | B.IOP-1 to 3 |
+| PRIV-M1 to PRIV-M8 | yes: nothing stored, nothing requested, no web font; an old storage key is removed | B.PRIV |
+
 ## Implementation suggestions (SHOULD / MAY)
 
 - **S1** SHOULD add a fixture page with a long sidebar and a table of contents so the keyboard pass covers them.
@@ -227,3 +325,15 @@ Hermetic: all of it (fixture site; routes refuse non-local requests). Live: the 
 ## Re-verification log
 
 - 2026-11-01 — first-pass baseline. Read every source file and the fixture; ran `npm ci`, `npm ls --all`, the audit gate, type-check, lint, unit tests (12), build, `npm pack --dry-run`; ran the five-browser e2e with the CI font (105 passed); installed VitePress alpha.21 and re-ran landmark tests, build and the shared sweep (all pass), merged the Dependabot PR; converted the fixture gate to the shared sweep (F1) and published `SECURITY.md` (F2). F6 handed to `OPERATOR_TASKS.md`.
+- 2026-11-21 — Part B documentation pass and first application of the DOCS, RFC, IOP and PRIV lenses (above, "Part B documentation pass"). Baseline before editing: `npm ci`, type-check, lint, 79 tests, build, 34 browser
+  tests on Chromium, the audit gate. Every tracked file annotated to the documentation standard (headers, TSDoc on every declaration, a reason beside each CSS group); `CONTRIBUTING.md` and `AGENTS.md` added; README
+  Development section; CLAUDE.md Commands, Gotchas and Related sections. Found and fixed **F10** (documentation drift: the audit did not describe the bins, a stale tarball and test count, a thin Development section, an
+  un-annotated copy of the gate). Verified live: npm `0.0.7` latest; consumers docs-site and dev-site; Dependabot #8 green on all five browser projects. Re-run after editing: the same commands, all passing; the diff proven
+  comment-only (compiled output, the built declaration, parsed YAML, `.gitignore` patterns). Recorded outside the repository: FU-0196 applied here (the copy of the gate is gone). Counts: F1 to F10 (two Positive): 4 RESOLVED,
+  1 MITIGATED, 2 ADJUDICATED, 1 DEFERRED.
+
+## Pre-save consistency checklist (this pass)
+
+- [x] 2026-11-21: Template line cites DOCS, RFC, IOP and PRIV with their registry dates; their front-matter fields, Section B subsections and MUST rows added; F10 recorded in the findings and the log; the deployment
+  status, packaging, test counts and consumers current.
+

@@ -1,3 +1,5 @@
+// Build settings (`npm run build`): emit the declaration for the one built file, `src/config.js` (dist/config.d.ts), so a site's TypeScript config gets types
+// for `baseConfig`. The rest of the package ships as source: a theme is bundled by VitePress's own Vite, which compiles `.ts` and `.vue` from node_modules.
 {
   "extends": "./tsconfig.json",
   "compilerOptions": {
@@ -7,5 +9,6 @@
     "rootDir": "./src",
     "declarationDir": "./dist"
   },
+  // Only config.js is built: Node loads the config and refuses TypeScript inside node_modules, so it is plain JavaScript with JSDoc types.
   "include": ["src/config.js"]
 }

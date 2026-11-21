@@ -1,3 +1,8 @@
+/**
+ * Tests for the favicon set (`src/brand.js`): the files and a manifest are copied into the built site, the `<link>` tags are in every page's head,
+ * and the dev server serves the set. A fake `@meddleware/ui` (five placeholder brand files) is installed in a temp directory, and the process
+ * moves into it, because the set is resolved from the working directory.
+ */
 import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
@@ -5,6 +10,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { BRAND_FILES, brandDev, brandHead, copyBrand, manifest } from '../src/brand.js'
 import { baseConfig } from '../src/config.js'
 
+/** The temp directory standing in for a site. */
 let root: string
 const cwd = process.cwd()
 beforeEach(() => {
@@ -20,6 +26,7 @@ afterEach(() => {
   rmSync(root, { recursive: true, force: true })
 })
 
+// What a site gets without keeping an icon of its own: the files in the build, the tags in the head, and the dev server.
 describe('the brand icons of a site', () => {
   it('copies the set and a manifest into the built site', () => {
     const out = join(root, 'dist')

@@ -5,6 +5,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Changed
+- Documentation pass (line-level annotation): every source file, test, configuration and workflow explains itself; a fuller Development section in the README;
+  Commands, Gotchas and Related sections in CLAUDE.md; CONTRIBUTING.md and AGENTS.md. No behaviour change.
+- CI audits dependencies with the shared `mw-audit-gate` from `@meddleware/frontend-config` instead of a copy of the same file in this repository
+  (`.github/audit-gate.mjs` is removed; FU-0196).
+
 ## [0.0.7] - 2026-11-20
 
 ### Added

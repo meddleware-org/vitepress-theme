@@ -47,6 +47,30 @@ Version, CHANGELOG and lockfile are bumped by the release tooling. Push, tag `v<
 publishing after `node-ci.yml` (lint, tests, build, the five-browser gate, package contents) and the `node24-compat` job pass. Consumers
 pin `^0.0.x`, an exact pin on 0.0.x, so bump them together.
 
+## Commands
+
+```bash
+npm ci && npm run type-check && npm run lint && npm test   # what the `check` CI job runs, short of the build and the tarball check
+npm run build                                              # dist/config.d.ts (the only built file)
+npm run test:e2e                                           # builds docs/ (the fixture) and runs the axe sweep on Chromium (E2E_BROWSERS=all: five projects)
+npx --no-install mw-audit-gate                             # the dependency gate (from @meddleware/frontend-config)
+```
+
+## Gotchas
+
+- **No HTML comment before the root element of a `<template>`** (`MeddlewareLayout.vue`): in a development build it makes the component a fragment. Write
+  template notes inside the root or as `//` comments in `<script setup>`.
+- **Editing a landmark edit means running the tests against the installed VitePress.** The exact strings are VitePress's own; an upgrade that moves them fails
+  `tests/landmarks.test.ts` first, by design.
+- **The bins run from the consumer's directory**, so a test that exercises one must `cwd` into a temp site (`tests/helpers/site.ts`), never this repository.
+- **`.github/audit-gate.mjs` is not here any more**: CI runs `npx --no-install mw-audit-gate` (FU-0196).
+
+## Related
+
+- The audit: [`docs/audit/vitepress-theme-audit.md`](docs/audit/vitepress-theme-audit.md).
+- How to propose a change: [`CONTRIBUTING.md`](CONTRIBUTING.md).
+- Consumers: `docs-site` and `dev-site` (`^0.0.7`); release them after this package.
+
 ## Interoperability
 
 - [INTEROP.md](INTEROP.md): the standards this project speaks, what is planned, where to extend it, and what proves each claim.

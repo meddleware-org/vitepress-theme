@@ -90,8 +90,23 @@ must name at least one page. Paths (`outBase`, `base`) are relative, without a l
 
 ## Development
 
-`npm run build:site` builds the fixture site in `docs/`; `npm run test:e2e` runs axe (WCAG 2.2 AA and AAA) over it in every colour mode ×
-season (`E2E_BROWSERS=all` for five browsers); `npm run shots` captures the screenshot matrix.
+The package ships its source (the theme is compiled by the consuming site's Vite) plus one built declaration, `dist/config.d.ts`. The checks, all run in CI
+on every push:
+
+```bash
+npm ci                          # install exactly the lockfile
+npm run type-check              # vue-tsc over the JavaScript (checkJs), the TypeScript and the layout
+npm run lint                    # stylelint, eslint + vuejs-a11y, html-validate
+npm test                        # 79 tests: the config, the four site-script bins through a symlink, the landmark edits against the installed VitePress
+npm run build                   # dist/config.d.ts
+npx --no-install mw-audit-gate  # the dependency gate
+npx playwright install chromium
+npm run test:e2e                # builds the fixture site in docs/ and runs axe (WCAG 2.2 AA and AAA) over it in every colour mode × season
+                                # (34 tests on Chromium; E2E_BROWSERS=all for the five browser projects)
+npm run shots                   # the screenshot matrix, for looking
+```
+
+How to propose a change is in [`CONTRIBUTING.md`](CONTRIBUTING.md); the rules for changing the theme are in [`CLAUDE.md`](CLAUDE.md).
 
 ## Licence
 

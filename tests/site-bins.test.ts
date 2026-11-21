@@ -1,9 +1,15 @@
+/**
+ * Tests for the four site-script bins as an installed package runs them: every bin is listed, has a shebang and is executable, and each runs through
+ * its `node_modules/.bin` symlink from the site's root (the self-run guard compares real paths, so a symlink must work) and fails closed on a missing
+ * configuration.
+ */
 import { lstatSync, mkdirSync, readFileSync, readdirSync, statSync, symlinkSync } from 'node:fs'
 import { join } from 'node:path'
 import { afterEach, describe, expect, it } from 'vitest'
 import pkg from '../package.json' with { type: 'json' }
 import { bins, cleanupSites, deployments, devSite, docsSite, hex, TempSite } from './helpers/site'
 
+/** The site the current test uses (removed after each test). */
 let site: TempSite
 afterEach(cleanupSites)
 
@@ -14,11 +20,13 @@ describe('the package', () => {
       const file = join(import.meta.dirname, '..', rel)
       expect(readFileSync(file, 'utf8').startsWith('#!/usr/bin/env node\n'), name).toBe(true)
       expect(statSync(file).mode & 0o111, name).toBe(0o111)
+      // npm normalises a bin path and strips a leading `./`, which would rewrite the field on publish and make the package.json dirty.
       expect(rel.startsWith('./'), name).toBe(false) // npm strips a leading ./ and would rewrite the field
       expect(pkg.files.some((f) => rel.startsWith(`${f}/`)), name).toBe(true)
     }
   })
 
+  // A file in src/bin that is not listed would be published but not installed as a command: it is either dead or a forgotten entry.
   it('has no stray bin file: every file under src/bin is a listed bin', () => {
     const listed = new Set(Object.values(pkg.bin).map((rel) => rel.replace('src/bin/', '')))
     expect(new Set(readdirSync(join(import.meta.dirname, '..', 'src', 'bin')))).toEqual(listed)
@@ -27,6 +35,7 @@ describe('the package', () => {
 
 describe('each bin, run through its node_modules/.bin symlink from the site root', () => {
   it('is a symlink, as an installed bin is', () => {
+    // The bins are linked, not copied, as `npm install` does: the self-run guard must cope with the link.
     site = new TempSite()
     expect(lstatSync(join(site.root, 'node_modules/.bin/mw-gen-onchain')).isSymbolicLink()).toBe(true)
   })
@@ -35,6 +44,7 @@ describe('each bin, run through its node_modules/.bin symlink from the site root
     site = new TempSite()
     mkdirSync(join(site.root, 'dist'))
     site.write('docs/index.md', '# Home\n')
+    // One argument is a usage error (exit 2, with the usage line), not a failure of the work (exit 1).
     const bad = site.run('mw-gen-llms-full', ['https://e.test'])
     expect(bad.status).toBe(2)
     expect(bad.stderr).toContain('usage: mw-gen-llms-full')
@@ -47,6 +57,7 @@ describe('each bin, run through its node_modules/.bin symlink from the site root
   it('mw-gen-llms-full fails without dist/', () => {
     site = new TempSite()
     site.write('docs/index.md', '# Home\n')
+    // docs/ exists but the site has not been built: the generator refuses, because the file belongs beside the built pages.
     const r = site.run('mw-gen-llms-full', ['https://e.test', 'Title'])
     expect(r.status).toBe(1)
     expect(r.stderr).toContain('dist/ is missing')
@@ -56,6 +67,7 @@ describe('each bin, run through its node_modules/.bin symlink from the site root
     site = new TempSite()
     site.write('dist/index.html', '')
     expect(site.run('mw-check-dist-no-audit').stdout).toBe('dist check: no audit page in the built site.\n')
+    // The directory is an argument (default `dist`), so a site with another output directory can use the same bin.
     site.write('other/index.html', '')
     expect(site.run('mw-check-dist-no-audit', ['other']).status).toBe(0)
     site.write('dist/audit/index.html', '')

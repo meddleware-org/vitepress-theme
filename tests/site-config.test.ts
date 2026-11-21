@@ -1,10 +1,16 @@
+/**
+ * Tests for the site-script configuration readers (`src/site-config.js`): the `"meddleware"` section of a site's package.json is read and validated,
+ * and every reader fails closed with a message naming the key that is wrong, so a misconfigured site fails its build instead of guessing a default.
+ */
 import { afterEach, describe, expect, it } from 'vitest'
 import { readMeddlewareConfig, readOnchainIdsConfig, readSiteConfig } from '../src/site-config.js'
 import { cleanupSites, devSite, docsSite, TempSite } from './helpers/site'
 
 let site: TempSite
 afterEach(cleanupSites)
+/** A temp site whose package.json holds the given `meddleware` section. */
 const make = (meddleware?: unknown) => (site = new TempSite(meddleware))
+/** A deep copy, so a test can break one field of a shared configuration without changing it for the others. */
 const clone = <T>(value: T): T => structuredClone(value)
 
 describe('readSiteConfig', () => {
@@ -13,6 +19,7 @@ describe('readSiteConfig', () => {
   })
 
   it('fails without a meddleware section, a site, or an other site', () => {
+    // Each missing level names itself: a misconfigured site is told exactly which key to add.
     expect(() => readSiteConfig(make().root)).toThrow('"meddleware" must be an object')
     expect(() => readSiteConfig(make({}).root)).toThrow('"meddleware.site" must be an object')
     expect(() => readSiteConfig(make({ site: { id: 'docs', outBase: 'x' } }).root)).toThrow('"meddleware.site.otherSite" must be an object')
@@ -22,10 +29,12 @@ describe('readSiteConfig', () => {
     const bad = clone(docsSite)
     bad.site.id = ' '
     expect(() => readSiteConfig(make(bad).root)).toThrow('"meddleware.site.id" must be a non-empty string')
+    // A number is not a string either; the cast is needed to build the bad input the types forbid.
     ;(bad.site as { id: unknown }).id = 7
     expect(() => readSiteConfig(make(bad).root)).toThrow('"meddleware.site.id"')
   })
 
+  // The output base is joined onto `docs/`, so anything that could leave it (absolute, `..`, empty segments, backslashes) is refused.
   it.each(['/abs', 'trailing/', '../up', 'a/../b', 'a//b', 'back\\slash'])('refuses the output base %j', (outBase) => {
     const bad = clone(docsSite)
     bad.site.outBase = outBase
@@ -33,6 +42,7 @@ describe('readSiteConfig', () => {
   })
 
   it('refuses an origin with a path or no scheme', () => {
+    // The other site's origin is joined with a path later, so it must be a bare http(s) origin.
     for (const origin of ['meddleware.dev', 'https://meddleware.dev/docs', 'ftp://x']) {
       const bad = clone(docsSite)
       bad.site.otherSite.origin = origin

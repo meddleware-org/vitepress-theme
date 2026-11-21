@@ -27,6 +27,7 @@ import { pathToFileURL } from 'node:url'
 import { isEntryPoint } from '../entry-point.js'
 import { readOnchainIdsConfig } from '../site-config.js'
 
+/** A 32-byte on-chain id: `0x` and 64 hex digits (any case; compared lower-case). Shorter hex literals (a digest, a short address) are not ids. */
 const ID = /0x[0-9a-fA-F]{64}\b/g
 
 /** Directories no site publishes from: dependencies, VitePress's own, and the internal audit. */
@@ -154,6 +155,7 @@ export async function checkSite(root = process.cwd()) {
   return checkOnchainIds({ docsRoot: join(root, 'docs'), deployments: await loadDeployments(root), required, otherIds: otherIds.keys(), skipDirs, generated: outBase })
 }
 
+// Run as a command: exit 0 when every id agrees with the clients, 1 on drift or when the check cannot run (it fails closed).
 if (isEntryPoint(import.meta.url)) {
   let problems
   try {

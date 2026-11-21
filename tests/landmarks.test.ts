@@ -1,3 +1,7 @@
+/**
+ * Tests for the landmark edits (`src/landmarks.js`), run against the VitePress that is installed: each edit does what it says, fails loudly (naming the
+ * file) when VitePress no longer has the text it expects, and the plugin applies the edits to the two components only.
+ */
 import { readFileSync } from 'node:fs'
 import { createRequire } from 'node:module'
 import { dirname, join } from 'node:path'

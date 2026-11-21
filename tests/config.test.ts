@@ -1,8 +1,15 @@
+/**
+ * Tests for the shared site configuration (`src/config.js`): where the source and output directories are derived from, the estate defaults, the
+ * browser-chrome colour from the tokens, the favicon set, the syntax themes, how extra options merge, and that the colour-mode choice is never stored
+ * (STORAGE_LEDGER B12).
+ */
 import { describe, expect, it } from 'vitest'
 import tokens from '@meddleware/design-tokens/tokens.json' with { type: 'json' }
 import { baseConfig, unstoredAppearance } from '../src/config.js'
 
+/** A site's config file, as a URL: the directories are derived from its location. */
 const configUrl = 'file:///site/docs/.vitepress/config.ts'
+/** The three options every site must give. */
 const base = { configUrl, title: 'T', description: 'D' }
 
 describe('baseConfig', () => {
@@ -75,6 +82,7 @@ describe('baseConfig', () => {
   })
 })
 
+// VitePress's switch stores its value on the first page load unless told not to; the config turns that off so nothing is stored before an action.
 describe('unstoredAppearance (STORAGE_LEDGER B12)', () => {
   it('keeps the first-visit mode and never stores the choice', () => {
     expect(unstoredAppearance('dark')).toEqual({ initialValue: 'dark', storageKey: null })
@@ -88,6 +96,7 @@ describe('unstoredAppearance (STORAGE_LEDGER B12)', () => {
   })
 })
 
+// `footerLinks` is not a default-theme key: the config passes it through to the theme config so MeddlewareLayout can render it.
 describe('footerLinks', () => {
   it('reaches the theme config for the layout, and defaults to none', () => {
     const links = [{ text: 'Treasury', link: 'https://treasury.meddleware.co.uk' }]

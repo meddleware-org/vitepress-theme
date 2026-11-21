@@ -1,14 +1,21 @@
+// TypeScript settings for type-checking (`npm run type-check`, through vue-tsc so the .vue file is checked too). The package is mostly JavaScript with JSDoc
+// types, so `checkJs` makes TypeScript check it; nothing is emitted (tsconfig.build.json emits the one declaration file).
 {
   "compilerOptions": {
+    // Node 26 and current browsers run the source as written, so no down-levelling is needed.
     "target": "esnext",
     "module": "esnext",
     "moduleResolution": "Bundler",
+    // The source is JavaScript: allow it and check it against its JSDoc types.
     "allowJs": true,
     "checkJs": true,
     "strict": true,
+    // Do not type-check the dependencies' own declaration files: their correctness is not this package's to prove.
     "skipLibCheck": true,
+    // Node's globals for the bins, and VitePress's client types (`import.meta.env`, `useData`) for the theme.
     "types": ["node", "vitepress/client"],
     "noEmit": true,
+    // Source files are imported by their real extension (`.js`), as Node requires.
     "allowImportingTsExtensions": false
   },
   "include": ["src/**/*.ts", "src/**/*.js", "src/**/*.vue", "tests/**/*.ts", "docs/.vitepress/**/*.ts", "e2e/**/*.ts"]

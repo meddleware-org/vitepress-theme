@@ -1,4 +1,6 @@
 // @ts-check
+// The self-run guard the site-script bins share: "is this module the script Node was started with?". A bin is started through a symlink in
+// `node_modules/.bin`, so the check compares real paths; tests/site-bins.test.ts runs every bin through such a symlink.
 import { realpathSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
 
@@ -10,5 +12,6 @@ import { fileURLToPath } from 'node:url'
  * @returns {boolean}
  */
 export function isEntryPoint(moduleUrl, entry = process.argv[1]) {
+  // No entry (an eval, a REPL) is never the entry point; otherwise both sides are resolved to real paths before they are compared.
   return Boolean(entry) && fileURLToPath(moduleUrl) === realpathSync(/** @type {string} */ (entry))
 }

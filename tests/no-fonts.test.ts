@@ -1,7 +1,12 @@
+/**
+ * Tests that the theme loads no web font: it imports the default theme without its Inter files, and its stylesheet names no font host or file.
+ * (A web font would be a request to the visitor's browser for something the system stack already provides.)
+ */
 import { readFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { describe, expect, it } from 'vitest'
 
+/** A source file's text. */
 const src = (f: string) => readFileSync(join(import.meta.dirname, '..', 'src', f), 'utf8')
 
 // VitePress's default theme ships sixteen Inter font files and preloads one; this theme sets its own system font stack and uses none of them.

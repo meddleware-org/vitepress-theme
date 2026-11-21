@@ -1,10 +1,16 @@
+/**
+ * Tests for `findAuditPages` (`src/bin/check-dist-no-audit.js`): it finds audit directories and files at any depth (without descending into a
+ * directory it has already reported), ignores names that only contain the word, and throws when the directory does not exist.
+ */
 import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { dirname, join } from 'node:path'
 import { afterEach, beforeEach, describe, expect, it } from 'vitest'
 import { findAuditPages } from '../src/bin/check-dist-no-audit.js'
 
+/** A temp directory standing in for a built site. */
 let dist: string
+/** Create an empty file in it (and its directories). */
 const write = (rel: string) => {
   mkdirSync(dirname(join(dist, rel)), { recursive: true })
   writeFileSync(join(dist, rel), '')
@@ -18,6 +24,7 @@ afterEach(() => rmSync(dist, { recursive: true, force: true }))
 describe('findAuditPages', () => {
   it('finds nothing in a site without audit material', () => {
     write('index.html')
+    // "auditing" contains the word but is not an audit page: only audit as a whole word counts.
     write('guide/auditing-your-code.html')
     write('assets/app.js')
     expect(findAuditPages(dist)).toEqual([])

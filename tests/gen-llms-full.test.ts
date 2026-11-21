@@ -1,9 +1,14 @@
+/**
+ * Tests for `generateLlmsFull` (`src/bin/gen-llms-full.js`): which pages go into llms-full.txt and in what order, that front matter is dropped and URLs
+ * are clean, that the audit and generated pages are left out, and that it fails when `dist/` or `docs/` is missing.
+ */
 import { afterEach, beforeEach, describe, expect, it } from 'vitest'
 import { mkdirSync, readFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { generateLlmsFull } from '../src/bin/gen-llms-full.js'
 import { TempSite } from './helpers/site'
 
+/** A temp site with a built `dist/` and a docs tree that has every kind of page the generator treats differently. */
 let site: TempSite
 beforeEach(() => {
   site = new TempSite()
@@ -12,6 +17,7 @@ beforeEach(() => {
   site.write('docs/zeta.md', 'Zeta\n')
   site.write('docs/guide/index.md', '# Guide\n')
   site.write('docs/guide/alpha.md', '---\na: 1\n---\n\n# Alpha\n\n')
+  // Everything below is marked SECRET: it must never appear in the output (the audit, VitePress's own files, assets, generated API pages, non-Markdown).
   site.write('docs/audit/internal.md', 'SECRET')
   site.write('docs/.vitepress/notes.md', 'SECRET')
   site.write('docs/public/readme.md', 'SECRET')

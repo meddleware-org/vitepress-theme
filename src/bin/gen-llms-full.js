@@ -10,14 +10,16 @@ import { join, relative, sep } from 'node:path'
 import { isEntryPoint } from '../entry-point.js'
 
 /**
+ * Whether a page is left out of llms-full.txt: the audit, VitePress's own files, static assets, and generated API reference pages.
  * @param {string} rel path under `docs/`, forward slashes
  * @returns {boolean}
  */
 const skip = (rel) => rel.startsWith('audit/') || rel.startsWith('.vitepress/') || rel.startsWith('public/') || /(^|\/)(api|wire-api)\//.test(rel)
 
 /**
+ * Every Markdown file under a directory, at any depth.
  * @param {string} dir
- * @returns {string[]}
+ * @returns {string[]} the file paths
  */
 function walk(dir) {
   return readdirSync(dir).flatMap((name) => {
@@ -40,13 +42,17 @@ export function generateLlmsFull({ siteUrl, title, root = process.cwd() }) {
   const pages = walk(docs)
     .map((p) => relative(docs, p).split(sep).join('/'))
     .filter((rel) => !skip(rel))
+    // The home page first, then the rest in name order, so the file reads from the front door inward.
     .sort((a, b) => (a === 'index.md' ? -1 : b === 'index.md' ? 1 : a.localeCompare(b)))
 
+  // A page's public URL: `guide/index.md` is `/guide/`, `guide/x.md` is `/guide/x` (the site uses clean URLs).
   const url = (/** @type {string} */ rel) => siteUrl.replace(/\/$/, '') + '/' + rel.replace(/(^|\/)index\.md$/, '$1').replace(/\.md$/, '')
+  // A page's Markdown without its front matter, which is configuration, not content.
   const body = (/** @type {string} */ rel) => readFileSync(join(docs, rel), 'utf8').replace(/^---\n[\s\S]*?\n---\n/, '').trim()
 
   const out = [`# ${title}`, '', `> The full text of ${siteUrl}, one section per page.`, '']
   for (const rel of pages) out.push(`---`, '', `Source: ${url(rel)}`, '', body(rel), '')
+  // The file goes next to the built site; with no dist/ the build has not run and there is nothing to publish it with.
   if (!existsSync(dist)) throw new Error('dist/ is missing: run vitepress build first')
   const file = join(dist, 'llms-full.txt')
   writeFileSync(file, out.join('\n'))

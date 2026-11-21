@@ -22,6 +22,8 @@ export function findAuditPages(dist) {
     for (const entry of readdirSync(dir, { withFileTypes: true })) {
       const p = join(dir, entry.name)
       const rel = relative(dist, p).split(sep).join('/')
+      // A name with `audit` as a whole word (audit, security-audit, audit.report), not as part of another word ("auditing-your-code" is fine).
+      // An audit directory is reported once and not walked into.
       if (/(^|[-_.])audit([-_.]|$)/i.test(entry.name)) found.push(rel)
       else if (entry.isDirectory()) walk(p)
     }
@@ -30,6 +32,7 @@ export function findAuditPages(dist) {
   return found
 }
 
+// Run as a command: exit 0 when the built site is clean, 1 when audit material is in it or the directory cannot be read.
 if (isEntryPoint(import.meta.url)) {
   const dist = resolve(process.argv[2] ?? 'dist')
   let found

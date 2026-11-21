@@ -12,7 +12,12 @@ const { hasSidebar } = useLayout()
 // Links a site adds to the footer (`themeConfig.footerLinks: [{ text, link }]`), e.g. the treasury: things a reader may want that are
 // not part of the site's own navigation.
 const { theme } = useData()
+// A computed so a change to the theme config (during development) reaches the footer; absent means none.
 const footerLinks = computed<{ text: string; link: string }[]>(() => (theme.value as { footerLinks?: { text: string; link: string }[] }).footerLinks ?? [])
+// Template: the default Layout with two slots filled. `nav-bar-title-before` puts the company mark before the site title in the navigation bar.
+// `layout-bottom` is below the page content, where the footer goes: an AppFooter holding the copyright line (the Kopimi notice, "All jams
+// preserved") and, when the site has them, its footer links in the `end` slot. The wrapper only carries the class that offsets the footer
+// from a fixed sidebar (theme.css). No comment is placed before the root element: it would make the component a fragment in development.
 </script>
 
 <template>

@@ -7,6 +7,7 @@ import { createRequire } from 'node:module'
 import { join } from 'node:path'
 import tokens from '@meddleware/design-tokens/tokens.json' with { type: 'json' }
 
+/** The five files of the set, with the media type each is served as in development. */
 export const BRAND_FILES = /** @type {const} */ ({
   'favicon.svg': 'image/svg+xml',
   'favicon.ico': 'image/x-icon',
@@ -15,10 +16,19 @@ export const BRAND_FILES = /** @type {const} */ ({
   'icon-512.png': 'image/png',
 })
 
-/** @param {string} file */
+/**
+ * Where a brand file is installed: `@meddleware/ui` is resolved from the site's own directory (it is the site's dependency, not this package's,
+ * so resolving from here would fail under pnpm or with a different version).
+ * @param {string} file - one of the {@link BRAND_FILES} names
+ * @returns {string} the absolute path
+ */
 const brandPath = (file) => createRequire(join(process.cwd(), 'noop.js')).resolve(`@meddleware/ui/brand/${file}`)
 
-/** @param {string} name */
+/**
+ * The web manifest: the site's name, the three icons and the dark page colour from the design tokens (so the browser chrome matches the page).
+ * @param {string} name - the site's title
+ * @returns {string} the manifest as JSON text
+ */
 export function manifest(name) {
   return JSON.stringify(
     {
@@ -31,6 +41,7 @@ export function manifest(name) {
       ],
       theme_color: tokens.semantic.dark.bg,
       background_color: tokens.semantic.dark.bg,
+      // `browser`, not `standalone`: a documentation site is not an installable app; the manifest only supplies the icons and colours.
       display: 'browser',
     },
     null,
@@ -46,14 +57,22 @@ export const brandHead = /** @type {import('vitepress').HeadConfig[]} */ ([
   ['link', { rel: 'manifest', href: '/site.webmanifest' }],
 ])
 
-/** Copy the files and the manifest into the built site. @param {string} outDir @param {string} name */
+/**
+ * Copy the files and the manifest into the built site, at its root, where the `<link>` tags point.
+ * @param {string} outDir - the build output directory
+ * @param {string} name - the site's title, for the manifest
+ */
 export function copyBrand(outDir, name) {
   mkdirSync(outDir, { recursive: true })
   for (const file of Object.keys(BRAND_FILES)) copyFileSync(brandPath(file), join(outDir, file))
   writeFileSync(join(outDir, 'site.webmanifest'), manifest(name))
 }
 
-/** Development only: serve the set. @param {string} name @returns {import('vite').Plugin} */
+/**
+ * Development only: serve the set from the installed package, so the favicon and manifest work under `vitepress dev` without a copy step.
+ * @param {string} name - the site's title, for the manifest
+ * @returns {import('vite').Plugin} a Vite plugin that applies to the dev server only
+ */
 export function brandDev(name) {
   return {
     name: 'meddleware:brand-icons',

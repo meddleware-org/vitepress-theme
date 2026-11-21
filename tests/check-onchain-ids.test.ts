@@ -1,3 +1,8 @@
+/**
+ * Tests for the on-chain id drift check (`src/bin/check-onchain-ids.js`): a hand-written page must not carry a stale 32-byte id, the reference
+ * pages must show the current ones, the audit and generated trees are skipped, and the check fails closed when a client or the configuration is
+ * missing. The scenarios are those of docs-site and dev-site, ported, against each site's configuration.
+ */
 import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { dirname, join } from 'node:path'
@@ -6,7 +11,9 @@ import { checkOnchainIds, checkSite, loadDeployments } from '../src/bin/check-on
 import { deployments, devSite, docsSite, hex, TempSite } from './helpers/site'
 
 // The unit tests of docs-site and dev-site, ported: the same scenarios against each site's configuration.
+/** A temp docs directory for the pure checks. */
 let docsRoot: string
+/** Write a page into it. */
 const write = (rel: string, text: string) => {
   mkdirSync(dirname(join(docsRoot, rel)), { recursive: true })
   writeFileSync(join(docsRoot, rel), text)
@@ -19,7 +26,9 @@ afterEach(() => rmSync(docsRoot, { recursive: true, force: true }))
 
 describe('checkOnchainIds, as docs-site configures it', () => {
   const { required, skipDirs } = docsSite.onchainIds
+  // The check's options for this site: its required pages, the skipped directories and the generated tree.
   const options = () => ({ docsRoot, deployments, required, skipDirs, generated: docsSite.site.outBase })
+  // Three reference pages that each show the ids they are required to show: the baseline every failing case changes one thing in.
   const goodPages = () => {
     write('blockchain/sui/access-gate/reference.md', `| a | \`${hex('a')}\` |\n| b | \`${hex('b')}\` |\n`)
     write('blockchain/sui/treasury/reference.md', `${hex('a')} ${hex('b')}`)
@@ -33,6 +42,7 @@ describe('checkOnchainIds, as docs-site configures it', () => {
 
   it('fails on a superseded id in a reference page', () => {
     goodPages()
+    // The treasury page now shows an id (e) that no deployment has, and has lost the current original id (a).
     write('blockchain/sui/treasury/reference.md', `${hex('e')} ${hex('b')}`)
     const problems = checkOnchainIds(options())
     expect(problems.some((p) => p.includes('treasury/reference.md') && p.includes('not a current deployment id'))).toBe(true)
@@ -47,12 +57,14 @@ describe('checkOnchainIds, as docs-site configures it', () => {
 
   it('fails on a stale id in any hand-written page, case-insensitively', () => {
     goodPages()
+    // Upper-case hex is the same id: a page must not hide a stale id by changing its case.
     write('blockchain/sui/guide.md', `see 0x${'E'.repeat(64)}`)
     expect(checkOnchainIds(options())).toEqual([expect.stringContaining('guide.md')])
   })
 
   it('ignores the audit, generated onchain and api trees', () => {
     goodPages()
+    // The same stale id (f) in every tree the check must not read: the audit, the generated pages, API trees, VitePress's own files and dependencies.
     write('audit/a-audit.md', hex('f'))
     write('blockchain/sui/onchain/access-gate/overview.md', hex('f'))
     write('blockchain/sui/walrus-storage/api/x.md', hex('f'))
@@ -64,8 +76,10 @@ describe('checkOnchainIds, as docs-site configures it', () => {
 
   it('scans a tree that is only named like the generated one, and the api tree when it is not configured', () => {
     goodPages()
+    // A directory merely named `onchain` somewhere else is not the generated tree (that is a path, not a name), so it is scanned.
     write('blockchain/sui/other/onchain/x.md', hex('f'))
     expect(checkOnchainIds(options())).toEqual([expect.stringContaining('other/onchain/x.md')])
+    // And an API tree is only skipped when the site configures it (`skipDirs`); without that setting it is scanned like any other.
     rmSync(join(docsRoot, 'blockchain/sui/other'), { recursive: true })
     write('blockchain/sui/walrus-storage/api/x.md', hex('f'))
     expect(checkOnchainIds({ ...options(), skipDirs: [] })).toEqual([expect.stringContaining('api/x.md')])
@@ -129,6 +143,7 @@ describe('checkOnchainIds, as dev-site configures it', () => {
   })
 })
 
+// The same check end to end: the deployments are read from the installed clients (TypeScript source in node_modules, as they are published).
 describe('loadDeployments and checkSite, against installed clients', () => {
   let site: TempSite
   beforeEach(() => {
