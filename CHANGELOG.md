@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.0.9] - 2026-11-27
+
+### Fixed
+
+- `mw-check-onchain-ids` reads a client's deployments file that re-exports a sibling module (`export { ... } from './committees.js'`, as `@meddleware/sealed-storage-client` 0.0.28 does): the relative re-export is dropped before the file is imported from a data: URL, which cannot resolve it. Before, the check failed with "Failed to resolve module specifier".
+
 ## [0.0.8] - 2026-11-27
 
 ### Changed

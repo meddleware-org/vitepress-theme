@@ -59,7 +59,10 @@ async function loadTsModule(file, resolveFrom) {
   const out = ts.transpileModule(readFileSync(file, 'utf8'), {
     compilerOptions: { module: ts.ModuleKind.ESNext, target: ts.ScriptTarget.ES2022 },
   }).outputText
-  return import(`data:text/javascript;base64,${Buffer.from(out).toString('base64')}`)
+  // A client's deployments subpath may re-export its other data files (`export { ... } from './committees.js'`). A data: URL cannot resolve a
+  // relative specifier, and the ids are all this check reads, so those re-exports are dropped before the module is imported.
+  const standalone = out.replace(/^export\s*\{[^}]*\}\s*from\s*['"]\.\/[^'"]+['"];?\s*$/gm, '')
+  return import(`data:text/javascript;base64,${Buffer.from(standalone).toString('base64')}`)
 }
 
 /**

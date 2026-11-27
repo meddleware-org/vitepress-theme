@@ -3,7 +3,7 @@
  * pages must show the current ones, the audit and generated trees are skipped, and the check fails closed when a client or the configuration is
  * missing. The scenarios are those of docs-site and dev-site, ported, against each site's configuration.
  */
-import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs'
+import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { dirname, join } from 'node:path'
 import { afterEach, beforeEach, describe, expect, it } from 'vitest'
@@ -153,6 +153,15 @@ describe('loadDeployments and checkSite, against installed clients', () => {
   afterEach(() => site.remove())
 
   it('reads testnet deployments from both clients, resolved from the site root', async () => {
+    expect(await loadDeployments(site.root)).toEqual(deployments)
+  })
+
+  // sealed-storage-client 0.0.28 re-exports its Seal committees from the deployments subpath (`export { ... } from './committees.js'`); a data: URL cannot
+  // resolve that relative specifier, so the loader must drop the re-export and still read the deployments.
+  it('reads a deployments file that re-exports a sibling module', async () => {
+    const file = 'node_modules/@meddleware/sealed-storage-client/deployments.ts'
+    const text = readFileSync(join(site.root, file), 'utf8')
+    site.write(file, `${text}\nexport { SOMETHING_ELSE } from './committees.js'\n`)
     expect(await loadDeployments(site.root)).toEqual(deployments)
   })
 
